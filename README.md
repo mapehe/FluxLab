@@ -1,4 +1,4 @@
-# Cuda Simulation Experiment
+# CUDA Simulation Experiment
 
 This repo is my personal experiment. I'm interested in running some physics
 simulations with CUDA. The idea is to track my progress here.
