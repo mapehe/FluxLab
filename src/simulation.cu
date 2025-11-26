@@ -21,7 +21,7 @@ __global__ void simulationKernel(cuFloatComplex *d_array, int gridWidth,
   const float scale = fminf(gridWidth, gridHeight) / 2.0f;
 
   const float nx = (x - center_x) / scale;
-  const float ny = (y - center_y) / scale;
+  const float ny = (center_y - y) / scale;
 
   const float r = sqrtf(nx * nx + ny * ny);
 
