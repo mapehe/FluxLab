@@ -3,22 +3,29 @@
 # ------------------------------------------------
 
 # Compiler settings
-NVCC        = nvcc
-NVCC_FLAGS  = -O3 -std=c++17
+NVCC          = nvcc
 # Add architecture flags here (e.g., -arch=sm_75) if you know your GPU
+NVCC_FLAGS    = -O3 -std=c++17
 # NVCC_FLAGS += -arch=sm_70 
 
+# **Dependency Generation Flags**
+# -M: Tells nvcc/gcc/g++ to output a rule suitable for make describing the dependencies of the source file.
+# -MMD: Same as -M but omits system headers, and outputs the rule to a .d file.
+DEP_FLAGS     = -MMD
+
 # Project definitions
-TARGET      = hello
-SRC_DIR     = src
-OBJ_DIR     = obj
-BIN_DIR     = bin
-INC_DIR     = include
+TARGET        = main
+SRC_DIR       = src
+OBJ_DIR       = obj
+BIN_DIR       = bin
+INC_DIR       = include
 
 # Find all .cu files in the src directory
-SOURCES     = $(wildcard $(SRC_DIR)/*.cu)
+SOURCES       = $(wildcard $(SRC_DIR)/*.cu)
 # Create a list of object files based on source files
-OBJECTS     = $(patsubst $(SRC_DIR)/%.cu, $(OBJ_DIR)/%.o, $(SOURCES))
+OBJECTS       = $(patsubst $(SRC_DIR)/%.cu, $(OBJ_DIR)/%.o, $(SOURCES))
+# **Create a list of dependency files based on source files**
+DEPS          = $(patsubst $(SRC_DIR)/%.cu, $(OBJ_DIR)/%.d, $(SOURCES))
 
 # ------------------------------------------------
 # Build Rules
@@ -34,17 +41,23 @@ $(BIN_DIR)/$(TARGET): $(OBJECTS)
 	@echo "Build complete: $@"
 
 # Rule to compile .cu files into .o files
-# $< refers to the source file, $@ refers to the object file
+# **Dependency generation is added here via $(DEP_FLAGS)**
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cu
 	@echo "Compiling $<..."
-	$(NVCC) $(NVCC_FLAGS) -I$(INC_DIR) -c $< -o $@
+	$(NVCC) $(NVCC_FLAGS) $(DEP_FLAGS) -I$(INC_DIR) -c $< -o $@
 
 # Create specific directories if they don't exist
 directories:
 	@mkdir -p $(OBJ_DIR)
 	@mkdir -p $(BIN_DIR)
 
+# **Crucial step: Include the generated dependency files.**
+# This instructs Make to look inside each .d file to find the header dependencies
+# and recompile the corresponding .o file if any of them are newer.
+-include $(DEPS)
+
 # Clean up build artifacts
+# **Now also cleans up the dependency files (.d)**
 clean:
 	@echo "Cleaning up..."
 	rm -rf $(OBJ_DIR) $(BIN_DIR)

@@ -3,33 +3,27 @@
 #include <string>
 #include <cuda_runtime.h>
 #include "json.hpp"
+#include "simulation.h"
 
 using json = nlohmann::json;
 
-int readConfig() {
+json readConfig() {
     std::ifstream configFile("config.json");
     
     if (!configFile.is_open()) {
-        std::cerr << "Could not open config.json!" << std::endl;
-        return 1;
+        throw std::runtime_error("Could not open config.json!");
     }
 
     json config;
     try {
         configFile >> config;
     } catch (const json::parse_error& e) {
-        std::cerr << "JSON Parse Error: " << e.what() << std::endl;
-        return 1;
+        throw std::runtime_error(std::string("JSON Parse Error: ") + e.what());
     }
 
-    std::cout << "Found a configuration file with the following key-value pairs:" << std::endl << std::endl;
-
-    for (const auto& [key, value] : config.items()) {
-        std::cout << key << " : " << value << std::endl;
-    }
 
     std::cout << std::endl;
-    return 0;
+    return config;
 }
 
 int main() {
@@ -40,6 +34,6 @@ int main() {
     std::cout << "============================================" << std::endl;
     std::cout << std::endl << "STARTING..." << std::endl << std::endl;
 
-    readConfig();
+    run(readConfig());
     return 0;
 }

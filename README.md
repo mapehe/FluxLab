@@ -27,38 +27,66 @@ export USER="your-local-username"
 export PROJECT_ID="your-google-cloud-project-name"
 export SERVICE_ACCOUNT="your-google-cloud-service-account"
 export ZONE="us-east1-d"
-export REGION="us-east1"
+export REGION="us-east1
+export STORAGE_BUCKET="your-storage-bucket"
 ```
 
 ### 2. Workflow
 
-**1. Initialize**
+#### 1. Initialize
+
 Load your configuration.
 ```bash
 source .env
 ```
 
-**2. Provision**
+#### 2. Provision
+
 Spin up a CUDA-enabled VM.
 ```bash
-./scripts/local/create_cuda_instance.sh
+./scripts/cloud/create_cuda_instance.sh
 ```
 
-**3. Connect**
+#### 3. Connect
+
 SSH into the machine and you will be prompted to install the NVIDIA drivers.
 _Note: Wait a few minutes after creation._
 ```bash
-./scripts/local/ssh_instance.sh
+./scripts/cloud/ssh_instance.sh
 ```
 
-**4. Run**
-Compile and execute the solver on the remote GPU.
+#### 4. Run
+
+Compile and execute the solver on the remote GPU. This will also upload your
+results to a bucket.
 ```bash
-./scripts/local/compile_and_run.sh
+./scripts/cloud/compile_and_run.sh
 ```
 
-**5. Teardown**
-*Important:* Delete the instance when finished to avoid unnecessary billing.
+#### 5. Teardown
+
+Important: Delete the instance when finished to avoid unnecessary billing.
 ```bash
-./scripts/local/compile_and_run.sh
+./scripts/cloud/compile_and_run.sh
 ```
+
+### 3. Postprocess
+
+Check the contents of your storage bucket with this command.
+
+```
+gcloud storage ls gs://$STORAGE_BUCKET/
+```
+
+Download the desried file
+
+```
+gcloud storage cp gs://$STORAGE_BUCKET/$FILE $FILE
+```
+
+Run the postprocess script
+
+```
+./scripts/postprocess/postprocess.py $FILE
+```
+

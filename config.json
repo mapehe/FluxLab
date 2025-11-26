@@ -1,3 +1,8 @@
 {
-  "message": "Hello world!"
+  "iterations": 512,
+  "gridWidth": 512,
+  "gridHeight": 512,
+  "threadsPerBlockX": 32,
+  "threadsPerBlockY": 32,
+  "outputFile": "simulation_result"
 }
