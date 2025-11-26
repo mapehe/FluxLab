@@ -1,9 +1,22 @@
-# CUDA Simulation Experiment
+# CUDA Analog Gravity Experiment
 
-This repo is my personal experiment. I'm interested in running some physics
-simulations with CUDA. The idea is to track my progress here.
+## The Goal
+To simulate an "event horizon" in a Bose-Einstein Condensate (BEC) using
+parallel spectral methods. The aim is to observe Hawking-like phonon emission
+where the flow velocity exceeds the speed of sound using the dimensionless
+Gross-Pitaevskii Equation (GPE):
 
-## How to initialize
+$$i \frac{\partial \Psi}{\partial \tau} = \left( -\frac{1}{2} \nabla^2 + V +
+\kappa |\Psi|^2 \right) \Psi$$
+
+## Cloud Environment
+
+This project includes scripts to streamline running high-resolution simulations
+on Google Cloud Platform (GCP) GPU instances.
+
+### 1. Configuration
+Ensure you have the `gcloud` CLI installed and authorized with permissions to
+create GPU-enabled Compute Engine instances.
 
 Create an `.env` file with the following contents.
 
@@ -15,17 +28,37 @@ export ZONE="us-east1-d"
 export REGION="us-east1"
 ```
 
-Install `gcloud`, login, make sure you have the permissions to create
-GPU instancese.
-
 ## How to work
 
-1.  Load the `.env` with `source .env`.
-2.  Create a CUDA-enabled instance with `scripts/local/create_cuda_instance.sh`
-3.  Connect to the instance with `./scripts/local/ssh_instance.sh` and make
-    sure the NVIDIA drivers are installed. (It may take a few minutes for the
-    instance to be responsive.)
-4.  To compile and run the code on your CUDA instance
-    `scripts/local/compile_and_run.sh`
-5.  When done, remember to run `scripts/local/delete_cuda_instance.sh` to avoid
-    unnecessary bills.
+### 2. Workflow
+
+**1. Initialize**
+Load your configuration.
+```bash
+source .env
+```
+
+**2. Provision**
+Spin up a CUDA-enabled VM.
+```bash
+./scripts/local/create_cuda_instance.sh
+```
+
+**3. Connect**
+SSH into the machine and you will be prompted to install the NVIDIA drivers.
+_Note: Wait a few minutes after creation._
+```bash
+./scripts/local/ssh_instance.sh
+```
+
+**4. Run**
+Compile and execute the solver on the remote GPU.
+```bash
+./scripts/local/compile_and_run.sh
+```
+
+**5. Teardown**
+*Important:* Delete the instance when finished to avoid unnecessary billing.
+```bash
+./scripts/local/compile_and_run.sh
+```
