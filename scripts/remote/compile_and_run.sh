@@ -2,5 +2,4 @@
 
 set -e
 
-nvcc hello.cu -o hello
-./hello
+make run
