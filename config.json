@@ -1,7 +1,7 @@
 {
-  "iterations": 131072,
-  "gridWidth": 1024,
-  "gridHeight": 1024,
+  "iterations": 524288,
+  "gridWidth": 512,
+  "gridHeight": 512,
   "threadsPerBlockX": 32,
   "threadsPerBlockY": 32,
   "downloadFrequency": 512,
@@ -15,13 +15,13 @@
   "kx": 1.5,
   "ky": 0.0,
   "amp": 1.0,
-  "trapStr": 40000.0,
+  "trapStr": 200000.0,
 
-  "obstacleX": -0.07,
-  "obstacleY": -0.07,
+  "obstacleX": -0.05,
+  "obstacleY": 0,
   "obstacleSigma": 0.01,
   "obstacleHeight": 100000,
 
-  "dt": 0.000002,
+  "dt": 0.0000002,
   "g": 3000.0
 }
