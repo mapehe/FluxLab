@@ -20,7 +20,6 @@ json readConfig() {
     throw std::runtime_error(std::string("JSON Parse Error: ") + e.what());
   }
 
-  std::cout << std::endl;
   return config;
 }
 

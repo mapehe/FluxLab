@@ -21,11 +21,8 @@ OBJ_DIR       = obj
 BIN_DIR       = bin
 INC_DIR       = include
 
-# Find all .cu files in the src directory
 SOURCES       = $(shell find $(SRC_DIR) -name "*.cu")
-# Create a list of object files based on source files
 OBJECTS       = $(patsubst $(SRC_DIR)/%.cu, $(OBJ_DIR)/%.o, $(SOURCES))
-# **Create a list of dependency files based on source files**
 DEPS          = $(patsubst $(SRC_DIR)/%.cu, $(OBJ_DIR)/%.d, $(SOURCES))
 
 # ------------------------------------------------

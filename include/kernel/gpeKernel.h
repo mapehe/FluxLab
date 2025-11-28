@@ -2,29 +2,12 @@
 #define GPE_KERNEL_CUH
 
 #include "config.h"
+#include "io.h"
+#include "kernel/simulationMode.h"
 #include <cufft.h>
 #include <thrust/device_vector.h>
 #include <thrust/functional.h>
 #include <thrust/transform_reduce.h>
-
-template <> struct SimulationData<CUDAKernelMode::GrossPitaevskii> {
-  cuFloatComplex *d_psi;
-  cuFloatComplex *d_V;
-  cuFloatComplex *d_expK;
-  std::vector<cuFloatComplex> h_data;
-  cufftHandle plan;
-
-  dim3 grid;
-  dim3 block;
-
-  int width;
-  int height;
-  int iterations;
-  int downloadFrequency;
-  int downloadIterator;
-  float dt;
-  float g;
-};
 
 __global__ void initGaussian(cuFloatComplex *d_psi, int width, int height,
                              float dx, float dy, float x0, float y0,
@@ -49,21 +32,33 @@ __global__ void initComplexPotential(cuComplex *d_V_tot, int width, int height,
                                      float V_bias, float r_0, float sigma,
                                      float absorb_strength, float absorb_width);
 
-template <> struct MemoryResource<CUDAKernelMode::GrossPitaevskii> {
-  static SimulationData<CUDAKernelMode::GrossPitaevskii>
-  allocate(const Params &p);
+class GrossPitaevskiiSimulation : public SimulationMode {
+public:
+  explicit GrossPitaevskiiSimulation(const Params &p);
+  ~GrossPitaevskiiSimulation() override;
+  void launch(int t) override;
+  void appendFrame(std::vector<cuFloatComplex> &history) override;
+  void saveResults(const std::string &filename) override;
 
-  static void free(SimulationData<CUDAKernelMode::GrossPitaevskii> &data);
+private:
+  cuFloatComplex *d_psi;
+  cuFloatComplex *d_V;
+  cuFloatComplex *d_expK;
 
-  static void
-  append_frame(const SimulationData<CUDAKernelMode::GrossPitaevskii> &data,
-               std::vector<cuFloatComplex> &history);
-};
+  std::vector<cuFloatComplex> h_data;
 
-template <> struct KernelLauncher<CUDAKernelMode::GrossPitaevskii> {
-  static void launch(dim3 numBlocks, dim3 threadsPerBlock,
-                     SimulationData<CUDAKernelMode::GrossPitaevskii> &data,
-                     int t);
+  cufftHandle plan;
+
+  dim3 grid;
+  dim3 block;
+
+  int width;
+  int height;
+  int iterations;
+  int downloadFrequency;
+  int downloadIterator;
+  float dt;
+  float g;
 };
 
 #endif

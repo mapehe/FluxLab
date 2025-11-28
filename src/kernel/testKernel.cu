@@ -1,4 +1,5 @@
 #include "kernel/testKernel.h"
+#include "io.h"
 
 __host__ __device__ inline int get_flat_index(int x, int y, int gridWidth) {
   int W = gridWidth;
@@ -37,4 +38,65 @@ __global__ void testKernel(cuFloatComplex *d_array, int gridWidth,
   const float imag_part = sinf(phase);
 
   d_array[flat_index] = make_cuFloatComplex(real_part, imag_part);
+}
+
+TestSimulation::TestSimulation(const Params &p)
+    : d_grid(nullptr), width(p.gridWidth), height(p.gridHeight),
+      iterations(p.iterations), downloadFrequency(p.downloadFrequency),
+      downloadIterator(1) {
+  grid = dim3(p.threadsPerBlockX, p.threadsPerBlockY);
+  block = dim3((p.gridWidth + grid.x - 1) / grid.x,
+               (p.gridHeight + grid.y - 1) / grid.y);
+
+  size_t size = width * height * sizeof(cuFloatComplex);
+
+  cudaError_t err = cudaMalloc(&d_grid, size);
+  if (err != cudaSuccess) {
+    throw std::runtime_error("Failed to allocate TestSimulation device memory");
+  }
+
+  cudaMemset(d_grid, 0, size);
+
+  std::cout << "[Helper] Allocated an array (" << width << "x" << height << "x"
+            << iterations << ") on device." << std::endl;
+}
+
+TestSimulation::~TestSimulation() {
+  if (d_grid) {
+    cudaFree(d_grid);
+    d_grid = nullptr;
+  }
+}
+
+void TestSimulation::appendFrame(std::vector<cuFloatComplex> &history) {
+  size_t frame_elements = width * height;
+  size_t frame_bytes = frame_elements * sizeof(cuFloatComplex);
+  size_t old_size = history.size();
+
+  history.resize(old_size + frame_elements);
+  cuFloatComplex *host_destination = history.data() + old_size;
+  cudaMemcpy(host_destination, d_grid, frame_bytes, cudaMemcpyDeviceToHost);
+}
+
+void TestSimulation::launch(int t) {
+  downloadIterator--;
+  if (downloadIterator == 0) {
+    appendFrame(h_data);
+    downloadIterator = downloadFrequency;
+  }
+
+  testKernel<<<grid, block>>>(d_grid, width, height, t);
+  cudaDeviceSynchronize();
+
+  cudaError_t err = cudaGetLastError();
+  if (err != cudaSuccess) {
+    std::stringstream ss;
+    ss << "CUDA Error in TestSimulation: " << cudaGetErrorString(err);
+    throw std::runtime_error(ss.str());
+  }
+}
+
+void TestSimulation::saveResults(const std::string &filename) {
+  saveToBinary(filename, this->h_data, this->width, this->height,
+               this->iterations);
 }

@@ -51,12 +51,6 @@ struct Params {
   float omega;
   float trapStr;
 
-  // --- Obstacle parameters ---
-  float obstacleX;
-  float obstacleY;
-  float obstacleSigma;
-  float obstacleHeight;
-
   float dt;
   float g;
 

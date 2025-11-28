@@ -81,19 +81,6 @@ Params preprocessParams(const json &j) {
   get_and_validate_param<float>(config.trapStr, j, "trapStr", is_non_negtive,
                                 non_negtive_number_message);
 
-  // --- Obstacle parameters ---
-  get_and_validate_param<float>(config.obstacleX, j, "obstacleX", always_true,
-                                "");
-
-  get_and_validate_param<float>(config.obstacleY, j, "obstacleY", always_true,
-                                "");
-
-  get_and_validate_param<float>(config.obstacleSigma, j, "obstacleSigma",
-                                is_positive, positive_number_message);
-
-  get_and_validate_param<float>(config.obstacleHeight, j, "obstacleHeight",
-                                is_positive, positive_number_message);
-
   get_and_validate_param<float>(config.g, j, "g", always_true, "");
 
   get_and_validate_param<float>(config.dt, j, "dt", is_positive,
