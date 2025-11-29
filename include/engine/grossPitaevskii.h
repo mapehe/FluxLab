@@ -4,6 +4,7 @@
 #include "config.h"
 #include "engine/computeEngine.h"
 #include "kernel/quantum/quantumKernels.cuh"
+#include "simulationMode.h"
 #include <cufft.h>
 
 class GrossPitaevskiiEngine : public ComputeEngine<cuFloatComplex> {
@@ -21,6 +22,9 @@ private:
   float dt;
   float g;
   cufftHandle plan;
+
+  std::tuple<GaussianArgs, PotentialArgs, KineticInitArgs>
+  createSimulationArgs(const Params &p, float dt) const;
 };
 
 #endif

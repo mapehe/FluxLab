@@ -59,47 +59,56 @@ Params preprocessParams(const json &j) {
   get_and_validate_param<std::string>(config.outputFile, j, "outputFile",
                                       is_not_empty, not_empty_message);
 
-  get_and_validate_param<SimulationMode>(config.kernelMode, j, "kernelMode",
-                                         modeValidator, not_empty_message);
+  get_and_validate_param<SimulationMode>(config.simulationMode, j,
+                                         "simulationMode", modeValidator,
+                                         not_empty_message);
 
-  get_and_validate_param<float>(config.L, j, "L", is_positive,
+  get_and_validate_param<float>(config.grossPitaevskii.L, j, "L", is_positive,
                                 positive_number_message);
 
-  get_and_validate_param<float>(config.sigma, j, "sigma", is_positive,
-                                positive_number_message);
+  get_and_validate_param<float>(config.grossPitaevskii.sigma, j, "sigma",
+                                is_positive, positive_number_message);
 
-  get_and_validate_param<float>(config.x0, j, "x0", always_true, "");
+  get_and_validate_param<float>(config.grossPitaevskii.x0, j, "x0", always_true,
+                                "");
 
-  get_and_validate_param<float>(config.y0, j, "y0", always_true, "");
+  get_and_validate_param<float>(config.grossPitaevskii.y0, j, "y0", always_true,
+                                "");
 
-  get_and_validate_param<float>(config.kx, j, "kx", always_true, "");
+  get_and_validate_param<float>(config.grossPitaevskii.kx, j, "kx", always_true,
+                                "");
 
-  get_and_validate_param<float>(config.ky, j, "ky", always_true, "");
+  get_and_validate_param<float>(config.grossPitaevskii.ky, j, "ky", always_true,
+                                "");
 
-  get_and_validate_param<float>(config.amp, j, "amp", always_true, "");
+  get_and_validate_param<float>(config.grossPitaevskii.amp, j, "amp",
+                                always_true, "");
 
-  get_and_validate_param<float>(config.trapStr, j, "trapStr", is_non_negtive,
-                                non_negtive_number_message);
-
-  get_and_validate_param<float>(config.g, j, "g", always_true, "");
-
-  get_and_validate_param<float>(config.dt, j, "dt", is_positive,
-                                positive_number_message);
-
-  get_and_validate_param<float>(config.V_bias, j, "V_bias", is_non_negtive,
-                                non_negtive_number_message);
-
-  get_and_validate_param<float>(config.r_0, j, "r_0", is_non_negtive,
-                                non_negtive_number_message);
-
-  get_and_validate_param<float>(config.sigma2, j, "sigma2", is_non_negtive,
-                                non_negtive_number_message);
-
-  get_and_validate_param<float>(config.absorbStrength, j, "absorbStrength",
+  get_and_validate_param<float>(config.grossPitaevskii.trapStr, j, "trapStr",
                                 is_non_negtive, non_negtive_number_message);
 
-  get_and_validate_param<float>(config.absorbWidth, j, "absorbWidth",
+  get_and_validate_param<float>(config.grossPitaevskii.g, j, "g", always_true,
+                                "");
+
+  get_and_validate_param<float>(config.grossPitaevskii.dt, j, "dt", is_positive,
+                                positive_number_message);
+
+  get_and_validate_param<float>(config.grossPitaevskii.V_bias, j, "V_bias",
                                 is_non_negtive, non_negtive_number_message);
+
+  get_and_validate_param<float>(config.grossPitaevskii.r_0, j, "r_0",
+                                is_non_negtive, non_negtive_number_message);
+
+  get_and_validate_param<float>(config.grossPitaevskii.sigma2, j, "sigma2",
+                                is_non_negtive, non_negtive_number_message);
+
+  get_and_validate_param<float>(config.grossPitaevskii.absorbStrength, j,
+                                "absorbStrength", is_non_negtive,
+                                non_negtive_number_message);
+
+  get_and_validate_param<float>(config.grossPitaevskii.absorbWidth, j,
+                                "absorbWidth", is_non_negtive,
+                                non_negtive_number_message);
 
   std::cout << "[Preprocess] Simulation configured to run for "
             << config.iterations << " iterations on a " << config.gridWidth

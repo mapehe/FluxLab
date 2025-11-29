@@ -6,7 +6,7 @@
   "threadsPerBlockY": 32,
   "downloadFrequency": 32,
   "outputFile": "simulation_result",
-  "kernelMode": "grossPitaevskii",
+  "simulationMode": "grossPitaevskii",
 
   "L": 1.0,
   "sigma": 0.1,

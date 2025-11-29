@@ -2,10 +2,10 @@
 #include "io.h"
 
 std::tuple<GaussianArgs, PotentialArgs, KineticInitArgs>
-createSimulationArgs(const Params &p, float dt) const {
+GrossPitaevskiiEngine::createSimulationArgs(const Params &p, float dt) const {
 
-  float dx = p.L / width;
-  float dy = p.L / height;
+  float dx = p.grossPitaevskii.L / width;
+  float dy = p.grossPitaevskii.L / height;
 
   float L_x = width * dx;
   float L_y = height * dy;
@@ -17,23 +17,23 @@ createSimulationArgs(const Params &p, float dt) const {
                         .height = height,
                         .dx = dx,
                         .dy = dy,
-                        .x0 = p.x0,
-                        .y0 = p.y0,
-                        .sigma = p.sigma,
-                        .kx = p.kx,
-                        .ky = p.ky,
-                        .amplitude = p.amp};
+                        .x0 = p.grossPitaevskii.x0,
+                        .y0 = p.grossPitaevskii.y0,
+                        .sigma = p.grossPitaevskii.sigma,
+                        .kx = p.grossPitaevskii.kx,
+                        .ky = p.grossPitaevskii.ky,
+                        .amplitude = p.grossPitaevskii.amp};
 
   PotentialArgs pArgs = {.width = width,
                          .height = height,
                          .dx = dx,
                          .dy = dy,
-                         .trapFreqSq = p.trapStr,
-                         .V_bias = p.V_bias,
-                         .r_0 = p.r_0,
-                         .sigma = p.sigma2,
-                         .absorb_strength = p.absorbStrength,
-                         .absorb_width = p.absorbWidth};
+                         .trapFreqSq = p.grossPitaevskii.trapStr,
+                         .V_bias = p.grossPitaevskii.V_bias,
+                         .r_0 = p.grossPitaevskii.r_0,
+                         .sigma = p.grossPitaevskii.sigma2,
+                         .absorb_strength = p.grossPitaevskii.absorbStrength,
+                         .absorb_width = p.grossPitaevskii.absorbWidth};
 
   KineticInitArgs kArgs = {
       .width = width, .height = height, .dk_x = dk_x, .dk_y = dk_y, .dt = dt};
@@ -42,7 +42,7 @@ createSimulationArgs(const Params &p, float dt) const {
 }
 
 GrossPitaevskiiEngine::GrossPitaevskiiEngine(const Params &p)
-    : ComputeEngine(p), dt(p.dt), g(p.g) {
+    : ComputeEngine(p), dt(p.grossPitaevskii.dt), g(p.grossPitaevskii.g) {
   cufftPlan2d(&plan, height, width, CUFFT_C2C);
 
   size_t num_pixels = width * height;

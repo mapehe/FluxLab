@@ -30,17 +30,7 @@ inline void from_json(const nlohmann::json &j, SimulationMode &mode) {
   }
 }
 
-struct Params {
-  int iterations;
-  int gridWidth;
-  int gridHeight;
-  int threadsPerBlockX;
-  int threadsPerBlockY;
-  int downloadFrequency;
-  std::string outputFile;
-  SimulationMode kernelMode;
-
-  // --- Physical parameters ---
+struct GrossPitaevskiiParams {
   float L;
   float sigma;
   float x0;
@@ -59,6 +49,19 @@ struct Params {
   float sigma2;
   float absorbStrength;
   float absorbWidth;
+};
+
+struct Params {
+  int iterations;
+  int gridWidth;
+  int gridHeight;
+  int threadsPerBlockX;
+  int threadsPerBlockY;
+  int downloadFrequency;
+  std::string outputFile;
+  SimulationMode simulationMode;
+
+  GrossPitaevskiiParams grossPitaevskii;
 };
 
 Params preprocessParams(const json &j);

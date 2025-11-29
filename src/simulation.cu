@@ -7,7 +7,7 @@
 
 template <typename T>
 std::unique_ptr<ComputeEngine<T>> getComputeEngine(const Params &params) {
-  switch (params.kernelMode) {
+  switch (params.simulationMode) {
   case SimulationMode::Test:
     return std::make_unique<TestEngine>(params);
 
