@@ -8,21 +8,24 @@
   "outputFile": "simulation_result",
   "simulationMode": "grossPitaevskii",
 
-  "L": 1.0,
-  "sigma": 0.1,
-  "x0": 0.15,
-  "y0": 0.15,
-  "kx": 1.5,
-  "ky": 0.0,
-  "amp": 1.0,
-  "trapStr": 5e6,
+  "grossPitaevskii": {
+    "L": 1.0,
+    "sigma": 0.1,
+    "x0": 0.15,
+    "y0": 0.15,
+    "kx": 1.5,
+    "ky": 0.0,
+    "amp": 1.0,
+    "trapStr": 5e6,
 
-  "V_bias": 500,
-  "r_0": 0.05,
-  "sigma2": 0.025,
-  "absorbStrength": 10e3,
-  "absorbWidth": 0.025,
+    "V_bias": 500,
+    "r_0": 0.05,
+    "sigma2": 0.025,
+    "absorbStrength": 10e3,
+    "absorbWidth": 0.025,
 
-  "dt": 6e-7,
-  "g": 10e1
+    "dt": 6e-7,
+    "g": 10e1
+  }
+
 }

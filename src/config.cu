@@ -1,13 +1,36 @@
 #include "config.h"
 #include <iostream>
 
+inline const nlohmann::json& get_nested(const nlohmann::json& j,
+                                        const std::string& key)
+{
+    const nlohmann::json* ptr = &j;
+
+    size_t start = 0;
+    while (true) {
+        size_t dot = key.find('.', start);
+        std::string part = key.substr(start, dot - start);
+
+        ptr = &ptr->at(part);  // go down one level
+
+        if (dot == std::string::npos)
+            break;
+
+        start = dot + 1;
+    }
+
+    return *ptr;
+}
+
+
 template <typename T>
 void get_and_validate_param(T &config_field, const json &j,
                             const std::string &key,
                             std::function<bool(const T &)> validator,
                             const std::string &validation_error_message) {
   try {
-    config_field = j.at(key).get<T>();
+    const auto& val = get_nested(j, key);
+    config_field = val.get<T>();
   } catch (const nlohmann::json::type_error &e) {
     throw std::runtime_error(
         "Params Error: Field '" + key +
@@ -63,51 +86,51 @@ Params preprocessParams(const json &j) {
                                          "simulationMode", modeValidator,
                                          not_empty_message);
 
-  get_and_validate_param<float>(config.grossPitaevskii.L, j, "L", is_positive,
+  get_and_validate_param<float>(config.grossPitaevskii.L, j, "grossPitaevskii.L", is_positive,
                                 positive_number_message);
 
-  get_and_validate_param<float>(config.grossPitaevskii.sigma, j, "sigma",
+  get_and_validate_param<float>(config.grossPitaevskii.sigma, j, "grossPitaevskii.sigma",
                                 is_positive, positive_number_message);
 
-  get_and_validate_param<float>(config.grossPitaevskii.x0, j, "x0", always_true,
+  get_and_validate_param<float>(config.grossPitaevskii.x0, j, "grossPitaevskii.x0", always_true,
                                 "");
 
-  get_and_validate_param<float>(config.grossPitaevskii.y0, j, "y0", always_true,
+  get_and_validate_param<float>(config.grossPitaevskii.y0, j, "grossPitaevskii.y0", always_true,
                                 "");
 
-  get_and_validate_param<float>(config.grossPitaevskii.kx, j, "kx", always_true,
+  get_and_validate_param<float>(config.grossPitaevskii.kx, j, "grossPitaevskii.kx", always_true,
                                 "");
 
-  get_and_validate_param<float>(config.grossPitaevskii.ky, j, "ky", always_true,
+  get_and_validate_param<float>(config.grossPitaevskii.ky, j, "grossPitaevskii.ky", always_true,
                                 "");
 
-  get_and_validate_param<float>(config.grossPitaevskii.amp, j, "amp",
+  get_and_validate_param<float>(config.grossPitaevskii.amp, j, "grossPitaevskii.amp",
                                 always_true, "");
 
-  get_and_validate_param<float>(config.grossPitaevskii.trapStr, j, "trapStr",
+  get_and_validate_param<float>(config.grossPitaevskii.trapStr, j, "grossPitaevskii.trapStr",
                                 is_non_negtive, non_negtive_number_message);
 
-  get_and_validate_param<float>(config.grossPitaevskii.g, j, "g", always_true,
+  get_and_validate_param<float>(config.grossPitaevskii.g, j, "grossPitaevskii.g", always_true,
                                 "");
 
-  get_and_validate_param<float>(config.grossPitaevskii.dt, j, "dt", is_positive,
+  get_and_validate_param<float>(config.grossPitaevskii.dt, j, "grossPitaevskii.dt", is_positive,
                                 positive_number_message);
 
-  get_and_validate_param<float>(config.grossPitaevskii.V_bias, j, "V_bias",
+  get_and_validate_param<float>(config.grossPitaevskii.V_bias, j, "grossPitaevskii.V_bias",
                                 is_non_negtive, non_negtive_number_message);
 
-  get_and_validate_param<float>(config.grossPitaevskii.r_0, j, "r_0",
+  get_and_validate_param<float>(config.grossPitaevskii.r_0, j, "grossPitaevskii.r_0",
                                 is_non_negtive, non_negtive_number_message);
 
-  get_and_validate_param<float>(config.grossPitaevskii.sigma2, j, "sigma2",
+  get_and_validate_param<float>(config.grossPitaevskii.sigma2, j, "grossPitaevskii.sigma2",
                                 is_non_negtive, non_negtive_number_message);
 
   get_and_validate_param<float>(config.grossPitaevskii.absorbStrength, j,
-                                "absorbStrength", is_non_negtive,
+                                "grossPitaevskii.absorbStrength", is_non_negtive,
                                 non_negtive_number_message);
 
   get_and_validate_param<float>(config.grossPitaevskii.absorbWidth, j,
-                                "absorbWidth", is_non_negtive,
+                                "grossPitaevskii.absorbWidth", is_non_negtive,
                                 non_negtive_number_message);
 
   std::cout << "[Preprocess] Simulation configured to run for "
