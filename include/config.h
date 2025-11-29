@@ -11,12 +11,12 @@
 
 using json = nlohmann::json;
 
-enum class CUDAKernelMode { Test, GrossPitaevskii };
+enum class SimulationMode { Test, GrossPitaevskii };
 
-inline void from_json(const nlohmann::json &j, CUDAKernelMode &mode) {
-  static const std::unordered_map<std::string, CUDAKernelMode> str_to_enum{
-      {"test", CUDAKernelMode::Test},
-      {"grossPitaevskii", CUDAKernelMode::GrossPitaevskii},
+inline void from_json(const nlohmann::json &j, SimulationMode &mode) {
+  static const std::unordered_map<std::string, SimulationMode> str_to_enum{
+      {"test", SimulationMode::Test},
+      {"grossPitaevskii", SimulationMode::GrossPitaevskii},
   };
 
   const std::string s = j.get<std::string>();
@@ -26,7 +26,7 @@ inline void from_json(const nlohmann::json &j, CUDAKernelMode &mode) {
     mode = it->second;
   } else {
     throw nlohmann::json::type_error::create(
-        302, "Unknown CUDAKernelMode: " + s, &j);
+        302, "Unknown SimulationMode: " + s, &j);
   }
 }
 
@@ -38,7 +38,7 @@ struct Params {
   int threadsPerBlockY;
   int downloadFrequency;
   std::string outputFile;
-  CUDAKernelMode kernelMode;
+  SimulationMode kernelMode;
 
   // --- Physical parameters ---
   float L;
@@ -62,9 +62,5 @@ struct Params {
 };
 
 Params preprocessParams(const json &j);
-
-template <CUDAKernelMode M> struct KernelLauncher;
-template <CUDAKernelMode M> struct SimulationData;
-template <CUDAKernelMode M> struct MemoryResource;
 
 #endif

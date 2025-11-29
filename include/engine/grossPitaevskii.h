@@ -10,7 +10,7 @@ class GrossPitaevskiiEngine : public ComputeEngine<cuFloatComplex> {
 public:
   explicit GrossPitaevskiiEngine(const Params &p);
   ~GrossPitaevskiiEngine() override;
-  void step(int t) override;
+  void solveStep(int t) override;
   void appendFrame(std::vector<cuFloatComplex> &history) override;
   void saveResults(const std::string &filename) override;
 

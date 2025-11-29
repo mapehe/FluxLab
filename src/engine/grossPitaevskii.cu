@@ -1,11 +1,48 @@
 #include "engine/grossPitaevskii.h"
 #include "io.h"
 
-GrossPitaevskiiEngine::GrossPitaevskiiEngine(const Params &p)
-    : ComputeEngine(p) {
+std::tuple<GaussianArgs, PotentialArgs, KineticInitArgs>
+createSimulationArgs(const Params &p, float dt) const {
 
-  dt = p.dt;
-  g = p.g;
+  float dx = p.L / width;
+  float dy = p.L / height;
+
+  float L_x = width * dx;
+  float L_y = height * dy;
+
+  float dk_x = (2.0f * M_PI) / L_x;
+  float dk_y = (2.0f * M_PI) / L_y;
+
+  GaussianArgs gArgs = {.width = width,
+                        .height = height,
+                        .dx = dx,
+                        .dy = dy,
+                        .x0 = p.x0,
+                        .y0 = p.y0,
+                        .sigma = p.sigma,
+                        .kx = p.kx,
+                        .ky = p.ky,
+                        .amplitude = p.amp};
+
+  PotentialArgs pArgs = {.width = width,
+                         .height = height,
+                         .dx = dx,
+                         .dy = dy,
+                         .trapFreqSq = p.trapStr,
+                         .V_bias = p.V_bias,
+                         .r_0 = p.r_0,
+                         .sigma = p.sigma2,
+                         .absorb_strength = p.absorbStrength,
+                         .absorb_width = p.absorbWidth};
+
+  KineticInitArgs kArgs = {
+      .width = width, .height = height, .dk_x = dk_x, .dk_y = dk_y, .dt = dt};
+
+  return {gArgs, pArgs, kArgs};
+}
+
+GrossPitaevskiiEngine::GrossPitaevskiiEngine(const Params &p)
+    : ComputeEngine(p), dt(p.dt), g(p.g) {
   cufftPlan2d(&plan, height, width, CUFFT_C2C);
 
   size_t num_pixels = width * height;
@@ -20,44 +57,7 @@ GrossPitaevskiiEngine::GrossPitaevskiiEngine(const Params &p)
   cudaMalloc(&d_expK, size_bytes);
   cudaMemset(d_expK, 0, size_bytes);
 
-  std::cout << "[Memory] Allocated Resources for grid " << p.gridWidth << "x"
-            << p.gridHeight << ":\n"
-            << " - Wavefunction (RW)\n"
-            << " - Potential Grid (R)\n"
-            << " - Kinetic Operator (R)\n"
-            << std::endl;
-
-  float dx = p.L / width;
-  float dy = p.L / height;
-
-  float L_x = width * dx;
-  float L_y = height * dy;
-
-  float dk_x = (2.0f * M_PI) / L_x;
-  float dk_y = (2.0f * M_PI) / L_y;
-
-  const GaussianArgs gArgs = {.width = width,
-                              .height = height,
-                              .dx = dx,
-                              .dy = dy,
-                              .x0 = p.x0,
-                              .y0 = p.y0,
-                              .sigma = p.sigma,
-                              .kx = p.kx,
-                              .ky = p.ky,
-                              .amplitude = p.amp};
-  const PotentialArgs pArgs = {.width = width,
-                               .height = height,
-                               .dx = dx,
-                               .dy = dy,
-                               .trapFreqSq = p.trapStr,
-                               .V_bias = p.V_bias,
-                               .r_0 = p.r_0,
-                               .sigma = p.sigma2,
-                               .absorb_strength = p.absorbStrength,
-                               .absorb_width = p.absorbWidth};
-  const KineticInitArgs kArgs = {
-      .width = width, .height = height, .dk_x = dk_x, .dk_y = dk_y, .dt = dt};
+  const auto [gArgs, pArgs, kArgs] = createSimulationArgs(p, dt);
 
   initGaussian<<<grid, block>>>(d_psi, gArgs);
   cudaDeviceSynchronize();
@@ -94,23 +94,14 @@ GrossPitaevskiiEngine::~GrossPitaevskiiEngine() {
 void GrossPitaevskiiEngine::appendFrame(std::vector<cuFloatComplex> &history) {
   size_t frame_elements = width * height;
   size_t frame_bytes = frame_elements * sizeof(cuFloatComplex);
-
   size_t old_size = history.size();
 
   history.resize(old_size + frame_elements);
-
   cuFloatComplex *host_destination = history.data() + old_size;
-
   cudaMemcpy(host_destination, d_psi, frame_bytes, cudaMemcpyDeviceToHost);
 }
 
-void GrossPitaevskiiEngine::step(int t) {
-  downloadIterator--;
-  if (downloadIterator == 0) {
-    appendFrame(h_data);
-    downloadIterator = downloadFrequency;
-  }
-
+void GrossPitaevskiiEngine::solveStep(int t) {
   float fft_scale = 1.0f / (float)(width * height);
 
   evolveRealSpace<<<grid, block>>>(d_psi, d_V, width, height, g, dt / 2.0f);
@@ -119,16 +110,9 @@ void GrossPitaevskiiEngine::step(int t) {
   cufftExecC2C(plan, d_psi, d_psi, CUFFT_INVERSE);
   evolveRealSpace<<<grid, block>>>(d_psi, d_V, width, height, g, dt / 2.0f);
   cudaDeviceSynchronize();
-
-  cudaError_t err = cudaGetLastError();
-  if (err != cudaSuccess) {
-    std::stringstream ss;
-    ss << "CUDA Error: " << cudaGetErrorString(err);
-    throw std::runtime_error(ss.str());
-  }
 }
 
 void GrossPitaevskiiEngine::saveResults(const std::string &filename) {
-  saveToBinary(filename, this->h_data, this->width, this->height,
+  saveToBinary(filename, this->historyData, this->width, this->height,
                this->iterations);
 }

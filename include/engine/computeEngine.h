@@ -13,7 +13,10 @@ protected:
   dim3 grid;
   dim3 block;
 
-  std::vector<T> h_data;
+  std::vector<T> historyData;
+
+  virtual void solveStep(int t) = 0;
+  virtual void appendFrame(std::vector<cuFloatComplex> &history) = 0;
 
 public:
   explicit ComputeEngine(const Params &p)
@@ -26,9 +29,24 @@ public:
 
   virtual ~ComputeEngine() = default;
 
-  virtual void step(int t) = 0;
-  virtual void appendFrame(std::vector<cuFloatComplex> &history) = 0;
   virtual void saveResults(const std::string &filename) = 0;
+
+  void step(int t) {
+    downloadIterator--;
+    if (downloadIterator == 0) {
+      appendFrame(historyData);
+      downloadIterator = downloadFrequency;
+    }
+
+    solveStep(t);
+
+    cudaError_t err = cudaGetLastError();
+    if (err != cudaSuccess) {
+      std::stringstream ss;
+      ss << "CUDA Error: " << cudaGetErrorString(err);
+      throw std::runtime_error(ss.str());
+    }
+  }
 };
 
 #endif

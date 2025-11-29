@@ -36,7 +36,7 @@ Params preprocessParams(const json &j) {
   const auto is_not_empty = [](const std::string &val) { return !val.empty(); };
   const char *const not_empty_message = "cannot be empty.";
 
-  const auto modeValidator = [](const CUDAKernelMode &m) { return true; };
+  const auto modeValidator = [](const SimulationMode &m) { return true; };
 
   get_and_validate_param<int>(config.iterations, j, "iterations", is_positive,
                               positive_number_message);
@@ -59,7 +59,7 @@ Params preprocessParams(const json &j) {
   get_and_validate_param<std::string>(config.outputFile, j, "outputFile",
                                       is_not_empty, not_empty_message);
 
-  get_and_validate_param<CUDAKernelMode>(config.kernelMode, j, "kernelMode",
+  get_and_validate_param<SimulationMode>(config.kernelMode, j, "kernelMode",
                                          modeValidator, not_empty_message);
 
   get_and_validate_param<float>(config.L, j, "L", is_positive,

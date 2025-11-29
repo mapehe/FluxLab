@@ -1,5 +1,5 @@
 #include "io.h"
-#include "kernel/testKernel.h"
+#include "kernel/testKernel.cuh"
 #include "kernel/util.cuh"
 
 __host__ __device__ inline int get_flat_index(int x, int y, int gridWidth) {

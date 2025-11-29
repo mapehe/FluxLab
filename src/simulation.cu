@@ -8,14 +8,14 @@
 template <typename T>
 std::unique_ptr<ComputeEngine<T>> getComputeEngine(const Params &params) {
   switch (params.kernelMode) {
-  case CUDAKernelMode::Test:
+  case SimulationMode::Test:
     return std::make_unique<TestEngine>(params);
 
-  case CUDAKernelMode::GrossPitaevskii:
+  case SimulationMode::GrossPitaevskii:
     return std::make_unique<GrossPitaevskiiEngine>(params);
 
   default:
-    throw std::runtime_error("Error: Invalid or unsupported CUDAKernelMode.");
+    throw std::runtime_error("Error: Invalid or unsupported SimulationMode.");
   }
 }
 
