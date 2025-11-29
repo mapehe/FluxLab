@@ -1,13 +1,9 @@
 #include "kernel/quantum/quantumKernels.cuh"
+#include "kernel/util.cuh"
 
 __global__ void evolveRealSpace(cuFloatComplex *d_psi, cuFloatComplex *d_V,
                                 int width, int height, float g, float dt) {
-  int i = blockIdx.x * blockDim.x + threadIdx.x;
-  int j = blockIdx.y * blockDim.y + threadIdx.y;
-  int idx = j * width + i;
-
-  if (i >= width || j >= height)
-    return;
+  int idx = get_flat_index({.width = width, .height = height});
 
   cuFloatComplex psi = d_psi[idx];
   cuFloatComplex V_c = d_V[idx];
@@ -33,12 +29,7 @@ __global__ void evolveRealSpace(cuFloatComplex *d_psi, cuFloatComplex *d_V,
 __global__ void evolveMomentumSpace(cuFloatComplex *d_psi,
                                     cuFloatComplex *d_expK, int width,
                                     int height, float scale) {
-  int i = blockIdx.x * blockDim.x + threadIdx.x;
-  int j = blockIdx.y * blockDim.y + threadIdx.y;
-  int idx = j * width + i;
-
-  if (i >= width || j >= height)
-    return;
+  int idx = get_flat_index({.width = width, .height = height});
 
   cuFloatComplex psi = d_psi[idx];
   cuFloatComplex kOp = d_expK[idx];
@@ -53,12 +44,9 @@ __global__ void evolveMomentumSpace(cuFloatComplex *d_psi,
 __global__ void initKineticOperator(cuFloatComplex *d_expK, int width,
                                     int height, float dk_x, float dk_y,
                                     float dt) {
+  int idx = get_flat_index({.width = width, .height = height});
   int i = blockIdx.x * blockDim.x + threadIdx.x;
   int j = blockIdx.y * blockDim.y + threadIdx.y;
-  int idx = j * width + i;
-
-  if (i >= width || j >= height)
-    return;
 
   float kx;
   if (i <= width / 2) {

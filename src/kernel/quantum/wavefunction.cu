@@ -1,4 +1,5 @@
 #include "kernel/quantum/quantumKernels.cuh"
+#include "kernel/util.cuh"
 #include <thrust/device_vector.h>
 #include <thrust/functional.h>
 #include <thrust/transform_reduce.h>
@@ -40,20 +41,8 @@ void normalizePsi(cuFloatComplex *d_psi, dim3 block, dim3 grid, int width,
 __global__ void initGaussian(cuFloatComplex *d_psi, int width, int height,
                              float dx, float dy, float x0, float y0,
                              float sigma, float kx, float ky, float amplitude) {
-  int x = threadIdx.x + blockIdx.x * blockDim.x;
-  int y = threadIdx.y + blockIdx.y * blockDim.y;
-  int idx = y * width + x;
-
-  if (x >= width || y >= height) {
-    return;
-  }
-
-  const float center_x = width / 2.0f;
-  const float center_y = height / 2.0f;
-  const float scale = fminf(width, height) / 2.0f;
-
-  const float nx = (x - center_x) / scale;
-  const float ny = (center_y - y) / scale;
+  int idx = get_flat_index({.width = width, .height = height});
+  auto [nx, ny] = get_normalized_coords({.width = width, .height = height});
 
   float dist_sq = (nx - x0) * (nx - x0) + (ny - y0) * (ny - y0);
   float envelope = amplitude * expf(-dist_sq / (2.0f * sigma * sigma));
