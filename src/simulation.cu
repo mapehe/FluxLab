@@ -1,17 +1,17 @@
 #include "config.h"
-#include "kernel/gpeKernel.h"
-#include "kernel/testKernel.h"
+#include "sim/grossPitaevskii.h"
+#include "sim/testSimulation.h"
 #include "simulation.h"
 #include <fstream>
 #include <iostream>
 
-std::unique_ptr<SimulationMode> getSimulationMode(const Params &params) {
+std::unique_ptr<ComputeEngine> getComputeEngine(const Params &params) {
   switch (params.kernelMode) {
   case CUDAKernelMode::Test:
-    return std::make_unique<TestSimulation>(params);
+    return std::make_unique<TestEngine>(params);
 
   case CUDAKernelMode::GrossPitaevskii:
-    return std::make_unique<GrossPitaevskiiSimulation>(params);
+    return std::make_unique<GrossPitaevskiiEngine>(params);
 
   default:
     throw std::runtime_error("Error: Invalid or unsupported CUDAKernelMode.");
@@ -21,10 +21,10 @@ std::unique_ptr<SimulationMode> getSimulationMode(const Params &params) {
 void run(json config) {
   std::cout << "[CPU] Preparing simulation..." << std::endl;
   const Params params = preprocessParams(config);
-  auto sim = getSimulationMode(params);
+  auto sim = getComputeEngine(params);
 
   for (int t = 0; t < params.iterations; ++t) {
-    sim->launch(t);
+    sim->step(t);
   }
 
   std::cout << "[CPU] Simulation complete." << std::endl;

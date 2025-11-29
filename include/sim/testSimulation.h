@@ -2,13 +2,14 @@
 #define TEST_KERNEL_CUH
 
 #include "config.h"
-#include "kernel/simulationMode.h"
+#include "kernel/testPhysics.h"
+#include "sim/simulationMode.h"
 
-class TestSimulation : public SimulationMode {
+class TestEngine : public ComputeEngine {
 public:
-  explicit TestSimulation(const Params &p);
-  ~TestSimulation() override;
-  void launch(int t) override;
+  explicit TestEngine(const Params &p);
+  ~TestEngine() override;
+  void step(int t) override;
   void appendFrame(std::vector<cuFloatComplex> &history) override;
   std::vector<cuFloatComplex> &getHistory() { return h_data; }
   void saveResults(const std::string &filename) override;

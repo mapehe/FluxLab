@@ -3,7 +3,7 @@
 
 #include "config.h"
 
-class SimulationMode {
+class ComputeEngine {
 protected:
   int width;
   int height;
@@ -14,7 +14,7 @@ protected:
   dim3 block;
 
 public:
-  explicit SimulationMode(const Params &p)
+  explicit ComputeEngine(const Params &p)
       : width(p.gridWidth), height(p.gridHeight), iterations(p.iterations),
         downloadFrequency(p.downloadFrequency), downloadIterator(1) {
     grid = dim3(p.threadsPerBlockX, p.threadsPerBlockY);
@@ -22,9 +22,9 @@ public:
                  (p.gridHeight + grid.y - 1) / grid.y);
   }
 
-  virtual ~SimulationMode() = default;
+  virtual ~ComputeEngine() = default;
 
-  virtual void launch(int t) = 0;
+  virtual void step(int t) = 0;
   virtual void appendFrame(std::vector<cuFloatComplex> &history) = 0;
   virtual void saveResults(const std::string &filename) = 0;
 };
