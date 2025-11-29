@@ -1,6 +1,6 @@
 #include "config.h"
-#include "engine/grossPitaevskii.h"
-#include "engine/testSimulation.h"
+#include "engine/grossPitaevskii.cuh"
+#include "engine/testSimulation.cuh"
 #include "simulation.h"
 #include <fstream>
 #include <iostream>

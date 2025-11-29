@@ -1,4 +1,4 @@
-#include "engine/grossPitaevskii.h"
+#include "engine/grossPitaevskii.cuh"
 #include "io.h"
 
 std::tuple<GaussianArgs, PotentialArgs, KineticInitArgs>

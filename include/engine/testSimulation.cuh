@@ -2,7 +2,7 @@
 #define TEST_KERNEL_CUH
 
 #include "config.h"
-#include "engine/computeEngine.h"
+#include "engine/computeEngine.cuh"
 #include "kernel/testKernel.cuh"
 
 class TestEngine : public ComputeEngine<cuFloatComplex> {

@@ -1,4 +1,4 @@
-#include "engine/testSimulation.h"
+#include "engine/testSimulation.cuh"
 #include "io.h"
 
 TestEngine::TestEngine(const Params &p) : ComputeEngine(p), d_grid(nullptr) {

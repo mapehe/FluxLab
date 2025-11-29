@@ -6,6 +6,7 @@
 NVCC          = nvcc
 # Add architecture flags here (e.g., -arch=sm_75) if you know your GPU
 NVCC_FLAGS    = -O3 -std=c++20
+CXX_FLAGS    	= -O3 -std=c++20
 # NVCC_FLAGS += -arch=sm_70 
 LIBS          = -lcufft
 
@@ -21,9 +22,15 @@ OBJ_DIR       = obj
 BIN_DIR       = bin
 INC_DIR       = include
 
-SOURCES       = $(shell find $(SRC_DIR) -name "*.cu")
-OBJECTS       = $(patsubst $(SRC_DIR)/%.cu, $(OBJ_DIR)/%.o, $(SOURCES))
-DEPS          = $(patsubst $(SRC_DIR)/%.cu, $(OBJ_DIR)/%.d, $(SOURCES))
+CU_SOURCES   = $(shell find src -name "*.cu")
+CPP_SOURCES  = $(shell find src -name "*.cpp")
+
+# Creates: obj/kernel/test.o instead of src/kernel/test.o
+CU_OBJECTS   = $(patsubst $(SRC_DIR)/%.cu, $(OBJ_DIR)/%.o, $(CU_SOURCES))
+CPP_OBJECTS  = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(CPP_SOURCES))
+
+OBJECTS      = $(CU_OBJECTS) $(CPP_OBJECTS)
+DEPS         = $(patsubst $(SRC_DIR)/%.cu, $(OBJ_DIR)/%.d, $(SOURCES))
 
 # ------------------------------------------------
 # Build Rules
@@ -38,14 +45,16 @@ $(BIN_DIR)/$(TARGET): $(OBJECTS)
 	$(NVCC) $(OBJECTS) $(LIBS) -o $@
 	@echo "Build complete: $@"
 
-# Rule to compile .cu files into .o files
-# **Dependency generation is added here via $(DEP_FLAGS)**
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cu
-	@echo "Compiling $<..."
+	@echo "Compiling CUDA $<..."
 	@mkdir -p $(dir $@)
 	$(NVCC) $(NVCC_FLAGS) $(DEP_FLAGS) -I$(INC_DIR) -c $< -o $@
 
-# Create specific directories if they don't exist
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@echo "Compiling C++ $<..."
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXX_FLAGS) $(DEP_FLAGS) -I$(INC_DIR) -c $< -o $@
+
 directories:
 	@mkdir -p $(OBJ_DIR)
 	@mkdir -p $(BIN_DIR)

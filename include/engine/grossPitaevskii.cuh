@@ -2,7 +2,7 @@
 #define GPE_KERNEL_CUH
 
 #include "config.h"
-#include "engine/computeEngine.h"
+#include "engine/computeEngine.cuh"
 #include "kernel/quantum/quantumKernels.cuh"
 #include "simulationMode.h"
 #include <cufft.h>

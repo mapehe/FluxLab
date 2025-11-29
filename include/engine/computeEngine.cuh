@@ -2,6 +2,8 @@
 #define SIMULATION_MODE_H
 
 #include "config.h"
+#include <cuComplex.h>
+#include <cuda_runtime.h>
 
 template <typename T> class ComputeEngine {
 protected:

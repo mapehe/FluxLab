@@ -2,8 +2,6 @@
 #define CONFIG_H
 
 #include "json.hpp"
-#include <cuComplex.h>
-#include <cuda_runtime.h>
 #include <iostream>
 #include <stdexcept>
 #include <string>
