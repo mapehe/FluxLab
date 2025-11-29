@@ -2,11 +2,11 @@
 #define GPE_KERNEL_CUH
 
 #include "config.h"
-#include "kernel/gpePhysics.h"
-#include "sim/simulationMode.h"
+#include "engine/computeEngine.h"
+#include "kernel/quantum/quantumKernels.cuh"
 #include <cufft.h>
 
-class GrossPitaevskiiEngine : public ComputeEngine {
+class GrossPitaevskiiEngine : public ComputeEngine<cuFloatComplex> {
 public:
   explicit GrossPitaevskiiEngine(const Params &p);
   ~GrossPitaevskiiEngine() override;
@@ -21,7 +21,6 @@ private:
   float dt;
   float g;
   cufftHandle plan;
-  std::vector<cuFloatComplex> h_data;
 };
 
 #endif

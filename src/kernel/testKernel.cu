@@ -1,5 +1,5 @@
 #include "io.h"
-#include "kernel/testPhysics.h"
+#include "kernel/testKernel.h"
 
 __host__ __device__ inline int get_flat_index(int x, int y, int gridWidth) {
   int W = gridWidth;

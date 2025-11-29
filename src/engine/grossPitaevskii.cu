@@ -1,5 +1,5 @@
+#include "engine/grossPitaevskii.h"
 #include "io.h"
-#include "sim/grossPitaevskii.h"
 
 GrossPitaevskiiEngine::GrossPitaevskiiEngine(const Params &p)
     : ComputeEngine(p) {

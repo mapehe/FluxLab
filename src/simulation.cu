@@ -1,11 +1,12 @@
 #include "config.h"
-#include "sim/grossPitaevskii.h"
-#include "sim/testSimulation.h"
+#include "engine/grossPitaevskii.h"
+#include "engine/testSimulation.h"
 #include "simulation.h"
 #include <fstream>
 #include <iostream>
 
-std::unique_ptr<ComputeEngine> getComputeEngine(const Params &params) {
+template <typename T>
+std::unique_ptr<ComputeEngine<T>> getComputeEngine(const Params &params) {
   switch (params.kernelMode) {
   case CUDAKernelMode::Test:
     return std::make_unique<TestEngine>(params);
@@ -21,7 +22,7 @@ std::unique_ptr<ComputeEngine> getComputeEngine(const Params &params) {
 void run(json config) {
   std::cout << "[CPU] Preparing simulation..." << std::endl;
   const Params params = preprocessParams(config);
-  auto sim = getComputeEngine(params);
+  auto sim = getComputeEngine<cuFloatComplex>(params);
 
   for (int t = 0; t < params.iterations; ++t) {
     sim->step(t);

@@ -3,7 +3,7 @@
 
 #include "config.h"
 
-class ComputeEngine {
+template <typename T> class ComputeEngine {
 protected:
   int width;
   int height;
@@ -12,6 +12,8 @@ protected:
   int downloadIterator;
   dim3 grid;
   dim3 block;
+
+  std::vector<T> h_data;
 
 public:
   explicit ComputeEngine(const Params &p)

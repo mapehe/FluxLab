@@ -1,5 +1,5 @@
+#include "engine/testSimulation.h"
 #include "io.h"
-#include "sim/testSimulation.h"
 
 TestEngine::TestEngine(const Params &p) : ComputeEngine(p), d_grid(nullptr) {
   size_t size = width * height * sizeof(cuFloatComplex);
