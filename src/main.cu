@@ -61,13 +61,7 @@ json parseArguments(int argc, char** argv) {
 
 
 int main(int argc, char** argv) {
-  std::cout << std::endl;
-  std::cout << "============================================" << std::endl;
-  std::cout << "||                                        ||" << std::endl;
-  std::cout << "||      S I M U L A T O R   v 0.0.1       ||" << std::endl;
-  std::cout << "||                                        ||" << std::endl;
-  std::cout << "============================================" << std::endl;
-  std::cout << std::endl << "STARTING..." << std::endl << std::endl;
+  std::cout << std::endl << "Starting FluxLab..." << std::endl;
 
   json cmdArgs = parseArguments(argc, argv);
   run(readConfig(cmdArgs));
