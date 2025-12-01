@@ -80,7 +80,7 @@ stress test for the system's technical capabilities:
   kernels.
 
 * **ComputeEngine Verification:** The GPE acts as the reference implementation
-  for how `ComputeEngine` modules should be tested. Because the GPE has strict
+  for how `ComputeEngine` modules should be built and tested. Because the GPE has strict
       invariants, it allows for validation against physical laws alongside
       **snapshot regression testing**. This ensures that the engine not only
       conserves physical quantities but also maintains exact numerical
