@@ -25,9 +25,12 @@ successfully decoupled from the infrastructure.
 
 FluxLab serves as a translation layer between two target groups:
 
-* For **software engineers** it provides a clean, linted, and modular C++
-  codebase. It abstracts physics logic into **ComputeEngines** and handles the
-  heavy lifting of GPU memory management, I/O, and cloud provisioning.
+* For **software engineers**, it transforms scientific simulation into a standard
+  engineering challenge. By abstracting complex physics logic into encapsulated
+  ComputeEngines, it exposes the project as a clean, modular C++ system. This
+  allows engineers to focus on architecture, optimization, and infrastructure
+  without needing deep domain expertise in the underlying governing equations.
+
 
 * For **physicists** it tackles the architectural challenges often encountered
   in scientific computing. FluxLab provides a professional software scaffolding
