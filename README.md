@@ -1,6 +1,6 @@
 # FluxLab: High-Performance Computational Physics Template
 
-FluxLab is a modular CUDA C++ project template designed to explore bridging the
+FluxLab is a modular CUDA C++ project template designed to bridge the
 gap between rigorous computational physics and modern software engineering.
 
 
