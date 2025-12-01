@@ -118,7 +118,7 @@ void GrossPitaevskiiEngine::saveResults(const std::string &filename) {
   json parameterData = {
     {"dx", dx},
     {"dy", dy}
-};
+  };
 
   saveToBinaryJSON({
         .filename = filename,

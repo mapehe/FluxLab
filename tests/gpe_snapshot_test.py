@@ -53,10 +53,7 @@ def apply_test_override():
     with open("configOverrides.json", "w") as f:
         json.dump(data, f, indent=4)
 
-    subprocess.run(
-        ["./bin/main", "--output", str(OUTPUT_PATH)],
-        check=True
-    )
+    subprocess.run(["./bin/main", "--output", str(OUTPUT_PATH)], check=True)
 
 
 def test_wavefunction_evolution_fidelity():
