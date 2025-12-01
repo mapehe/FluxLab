@@ -1,7 +1,10 @@
 # FluxLab: High-Performance Computational Physics Template
 
-FluxLab is a modular CUDA C++ project template designed to bridge the
-gap between rigorous computational physics and modern software engineering.
+FluxLab is a modular CUDA C++ project template designed to bridge the gap
+between rigorous computational physics and modern software engineering. It
+provides a portable development environment that allows researchers to develop
+and run CUDA simulations seamlessly, even without access to local NVIDIA
+hardware.
 
 
 ## Purpose
@@ -61,7 +64,7 @@ interference patterns. The time-evolution of the wavefunction $\psi$ is
 governed by:
 
 $$i \hbar \frac{\partial \psi}{\partial t} = \left( -\frac{\hbar^2}{2m}
-\nabla^2 + V(\mathbf{r}) + g |\psi|^2 \right) \psi$$
+\nabla^2 + V + g |\psi|^2 \right) \psi$$
 
 ### Role in the Template: Architectural Validation
 
@@ -85,11 +88,47 @@ stress test for the system's technical capabilities:
 
 ## Getting Started
 
+The project includes a default `config.json` designed to serve as an end-to-end
+"Hello World" test to verify your setup.
+
+### Running locally
+
+1. Create a Python virtual environment and install the required packages.
+```bash
+pip install -r requirements.txt
+```
+
+2. Build and run
+
+```bash
+make && ./bin/main --output example
+```
+3. Visualize the results
+```bash
+./scripts/postprocess/postprocess.py example
+```
+
+The simulation results will be rendered to `example.mp4`.
+
 ### No Local GPU? 
 
-If you do not have access to a local NVIDIA workstation, refer to
-[CLOUD.md](CLOUD.md). This guide details how to use the included utility
-scripts to provision ephemeral cloud instances and run simulations remotely.
+If you do not have access to a local NVIDIA workstation, you can run
+simulations using a cloud instance. Refer to [CLOUD.md](CLOUD.md) for setup and
+launch instructions.
+
+Once your cloud environment is ready, execute the simulation remotely:
+
+```bash
+./scripts/cloud/compile_and_run.sh --upload-video --output example
+```
+
+You can then download the resulting video using the gcloud CLI:
+
+```bash
+glcoud storage cp gs://$STORAGE_BUCKET/example.mp4 .
+```
+
+## Extending
 
 ### Building Your Own Engine
 
@@ -100,3 +139,13 @@ class. This implementation serves as an example of how to inherit from the base
 ### Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md)
+
+## Author & Contact
+
+FluxLab is developed by Matias Heikkilä (matias@bytesauna.com).
+
+* Bug Reports & Features: Please use the [Issue
+  Tracker](https://github.com/mapehe/FluxLab/issues).
+
+* Collaboration & Inquiries: For questions regarding custom ComputeEngines, HPC
+  consulting, or research collaborations, reach out to matias@bytesauna.com.
