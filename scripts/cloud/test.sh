@@ -6,8 +6,32 @@ cd $(dirname "$0")
 source load_env.sh
 cd "../.."
 
-./scripts/cloud/clean_instance.sh
-./scripts/cloud/compile_and_run.sh
+BUILD=true
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --no-build) 
+            BUILD=false
+            ;;
+        *) 
+            echo "Unknown parameter: $1" 
+            ;;
+    esac
+    shift 
+done
+
+if $BUILD; then
+    ./scripts/cloud/clean_instance.sh
+    ./scripts/cloud/compile_and_run.sh
+fi
+
+rsync -avz \
+  -e ./scripts/cloud/gcloud_rsync_wrapper.sh \
+  --exclude '.git' \
+  --exclude 'build_source' \
+  --exclude '*.o' \
+  --exclude '__pycache__' \
+  ./tests cuda-gpu:~/build_source/
 
 
 gcloud compute ssh --zone=$ZONE cuda-gpu --command "export STORAGE_BUCKET='${STORAGE_BUCKET}' OUTPUT_FILE='${OUTPUT_FILE}'; bash -s" <<'EOF'
