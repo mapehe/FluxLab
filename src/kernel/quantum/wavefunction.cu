@@ -1,4 +1,5 @@
 #include "kernel/quantum/quantumKernels.cuh"
+#include "kernel/math/linalg.cuh"
 #include "kernel/util.cuh"
 #include <thrust/device_vector.h>
 #include <thrust/functional.h>
@@ -38,7 +39,10 @@ __global__ void initGaussian(cuFloatComplex *d_psi, GaussianArgs args) {
   int idx = get_flat_index({.width = width, .height = height});
   auto [nx, ny] = get_normalized_coords({.width = width, .height = height});
 
-  float dist_sq = (nx - x0) * (nx - x0) + (ny - y0) * (ny - y0);
+  float2 pos = make_float2(nx, ny);
+  float2 center  = make_float2(args.x0, args.y0);
+  float dist_sq = distanceSq(current_pos, center_pos);
+
   float envelope = amplitude * expf(-dist_sq / (2.0f * sigma * sigma));
 
   float phase_angle = kx * nx + ky * ny;
