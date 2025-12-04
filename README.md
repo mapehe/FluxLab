@@ -58,6 +58,9 @@ FluxLab serves as a translation layer between two target groups:
 
 ## Implemented Physics: The Gross-Pitaevskii Equation
 
+⚠️ Tests have revealed bugs in the simulation code. These are being worked on, 
+however the GPE simulation is not accurate at the moment. ⚠️
+
 FluxLab currently implements a solver for the **Gross-Pitaevskii Equation
 (GPE)**.
 
