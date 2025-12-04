@@ -41,7 +41,7 @@ __global__ void initGaussian(cuFloatComplex *d_psi, GaussianArgs args) {
 
   float2 pos = make_float2(nx, ny);
   float2 center  = make_float2(args.x0, args.y0);
-  float dist_sq = distanceSq(current_pos, center_pos);
+  float dist_sq = distanceSq(pos, center);
 
   float envelope = amplitude * expf(-dist_sq / (2.0f * sigma * sigma));
 
