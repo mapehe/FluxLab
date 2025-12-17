@@ -7,16 +7,22 @@ using json = nlohmann::json;
 
 enum class SimulationMode { Test, GrossPitaevskii };
 
+struct SimulationModeMap {
+  static const std::unordered_map<std::string, SimulationMode> &get() {
+    static const std::unordered_map<std::string, SimulationMode> map{
+        {"test", SimulationMode::Test},
+        {"grossPitaevskii", SimulationMode::GrossPitaevskii},
+    };
+    return map;
+  }
+};
+
 inline void from_json(const nlohmann::json &j, SimulationMode &mode) {
-  static const std::unordered_map<std::string, SimulationMode> str_to_enum{
-      {"test", SimulationMode::Test},
-      {"grossPitaevskii", SimulationMode::GrossPitaevskii},
-  };
-
   const std::string s = j.get<std::string>();
-  auto it = str_to_enum.find(s);
+  const auto &map = SimulationModeMap::get();
 
-  if (it != str_to_enum.end()) {
+  auto it = map.find(s);
+  if (it != map.end()) {
     mode = it->second;
   } else {
     throw nlohmann::json::type_error::create(
