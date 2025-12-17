@@ -1,12 +1,22 @@
-#ifndef SIMULATION_MODE_H
-#define SIMULATION_MODE_H
+#ifndef COMPUTE_ENGINE_H
+#define COMPUTE_ENGINE_H
 
 #include "config.h"
 #include <cuComplex.h>
 #include <cuda_runtime.h>
 
 template <typename T> class ComputeEngine {
-private:
+protected:
+  const Params params;
+  int downloadIterator;
+
+  std::vector<T> historyData;
+
+  virtual void solveStep(int t) = 0;
+  virtual int getDownloadFrequency() = 0;
+  virtual int getTotalSteps() = 0;
+  virtual void appendFrame(std::vector<cuFloatComplex> &history) = 0;
+
   void step(int t) {
     if (downloadIterator == 0) {
       appendFrame(historyData);
@@ -21,17 +31,6 @@ private:
       throw std::runtime_error(ss.str());
     }
   }
-
-protected:
-  const Params params;
-  int downloadIterator;
-
-  std::vector<T> historyData;
-
-  virtual void solveStep(int t) = 0;
-  virtual int getDownloadFrequency() = 0;
-  virtual int getTotalSteps() = 0;
-  virtual void appendFrame(std::vector<cuFloatComplex> &history) = 0;
 
 public:
   ComputeEngine(const Params &p) : params(p), downloadIterator(0) {};

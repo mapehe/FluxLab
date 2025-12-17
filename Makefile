@@ -9,7 +9,7 @@ CXX_FLAGS     = -O3 -std=c++20
 LIBS          = -lcufft
 
 # [NEW] Google Test Libraries
-TEST_LIBS     = -lgtest -lgtest_main -lpthread
+TEST_LIBS     = -lgtest -lgtest_main -lpthread -lgmock
 
 # Dependency Generation Flags
 DEP_FLAGS     = -MMD

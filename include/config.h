@@ -2,6 +2,7 @@
 #define CONFIG_H
 
 #include "json.hpp"
+#include "simulationMode.h"
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -9,32 +10,7 @@
 
 using json = nlohmann::json;
 
-enum class SimulationMode { Test, GrossPitaevskii };
-
-struct SimulationModeMap {
-  static const std::unordered_map<std::string, SimulationMode> &get() {
-    static const std::unordered_map<std::string, SimulationMode> map{
-        {"test", SimulationMode::Test},
-        {"grossPitaevskii", SimulationMode::GrossPitaevskii},
-    };
-    return map;
-  }
-};
-
-inline void from_json(const nlohmann::json &j, SimulationMode &mode) {
-  const std::string s = j.get<std::string>();
-  const auto &map = SimulationModeMap::get();
-
-  auto it = map.find(s);
-  if (it != map.end()) {
-    mode = it->second;
-  } else {
-    throw nlohmann::json::type_error::create(
-        302, "Unknown SimulationMode: " + s, &j);
-  }
-}
-
-struct CommonParams {
+struct TestParams {
   int iterations;
   int gridWidth;
   int gridHeight;
@@ -42,8 +18,8 @@ struct CommonParams {
   int threadsPerBlockY;
   int downloadFrequency;
 
-  NLOHMANN_DEFINE_TYPE_INTRUSIVE(CommonParams, iterations, gridWidth,
-                                 gridHeight, threadsPerBlockY, threadsPerBlockY,
+  NLOHMANN_DEFINE_TYPE_INTRUSIVE(TestParams, iterations, gridWidth, gridHeight,
+                                 threadsPerBlockY, threadsPerBlockY,
                                  downloadFrequency)
 };
 
@@ -84,7 +60,7 @@ struct Params {
   std::string output;
   SimulationMode simulationMode;
 
-  CommonParams test;
+  TestParams test;
   GrossPitaevskiiParams grossPitaevskii;
 };
 

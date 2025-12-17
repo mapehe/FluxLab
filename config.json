@@ -1,5 +1,4 @@
 {
-  "simulationMode": "grossPitaevskii",
   "test": {
     "iterations": 8192,
     "gridWidth": 512,
