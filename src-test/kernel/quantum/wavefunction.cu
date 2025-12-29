@@ -9,7 +9,7 @@
 
 class WavefunctionTest : public ::testing::Test {
 protected:
-  cuFloatComplex *d_psi = nullptr;
+  cuDoubleComplex *d_psi = nullptr;
   int width = 128;
   int height = 128;
   int numElements;
@@ -42,7 +42,7 @@ protected:
     dy = 1.0f / width;
 
     ASSERT_CUDA_SUCCESS(
-        cudaMalloc(&d_psi, numElements * sizeof(cuFloatComplex)));
+        cudaMalloc(&d_psi, numElements * sizeof(cuDoubleComplex)));
   }
 
   void TearDown() override {
@@ -53,37 +53,37 @@ protected:
     cudaDeviceReset();
   }
 
-  void uploadData(const std::vector<cuFloatComplex> &h_data) {
+  void uploadData(const std::vector<cuDoubleComplex> &h_data) {
     ASSERT_EQ(h_data.size(), numElements) << "Host data size mismatch";
     ASSERT_CUDA_SUCCESS(cudaMemcpy(d_psi, h_data.data(),
-                                   numElements * sizeof(cuFloatComplex),
+                                   numElements * sizeof(cuDoubleComplex),
                                    cudaMemcpyHostToDevice));
   }
 
-  void downloadData(std::vector<cuFloatComplex> &h_data) {
+  void downloadData(std::vector<cuDoubleComplex> &h_data) {
     h_data.resize(numElements);
     ASSERT_CUDA_SUCCESS(cudaMemcpy(h_data.data(), d_psi,
-                                   numElements * sizeof(cuFloatComplex),
+                                   numElements * sizeof(cuDoubleComplex),
                                    cudaMemcpyDeviceToHost));
   }
 };
 
 TEST_F(WavefunctionTest, SquareMagnitudeLogic) {
   SquareMagnitude op;
-  cuFloatComplex x = make_cuFloatComplex(3.0f, 4.0f);
+  cuDoubleComplex x = make_cuDoubleComplex(3.0f, 4.0f);
   EXPECT_FLOAT_EQ(op(x), 25.0f);
-  cuFloatComplex y = make_cuFloatComplex(-2.0f, 4.0f);
+  cuDoubleComplex y = make_cuDoubleComplex(-2.0f, 4.0f);
   EXPECT_FLOAT_EQ(op(y), 20.0f);
 }
 
 TEST_F(WavefunctionTest, NormalizationEnsuresProbabilityIsOne) {
-  std::vector<cuFloatComplex> h_psi(numElements);
+  std::vector<cuDoubleComplex> h_psi(numElements);
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_real_distribution<float> dis(-5.0f, 5.0f);
 
   for (auto &val : h_psi) {
-    val = make_cuFloatComplex(dis(gen), dis(gen));
+    val = make_cuDoubleComplex(dis(gen), dis(gen));
   }
 
   uploadData(h_psi);
@@ -108,10 +108,10 @@ TEST_F(WavefunctionTest, NormalizationEnsuresProbabilityIsOne) {
 }
 
 TEST_F(WavefunctionTest, HandlesZeroWavefunctionGracefully) {
-  std::vector<cuFloatComplex> h_psi(numElements);
+  std::vector<cuDoubleComplex> h_psi(numElements);
 
   for (auto &val : h_psi) {
-    val = make_cuFloatComplex(0, 0);
+    val = make_cuDoubleComplex(0, 0);
   }
 
   uploadData(h_psi);
@@ -136,7 +136,7 @@ TEST_F(WavefunctionTest, HandlesZeroWavefunctionGracefully) {
 }
 
 TEST_F(WavefunctionTest, InitGaussianTest) {
-  std::vector<cuFloatComplex> h_psi(numElements);
+  std::vector<cuDoubleComplex> h_psi(numElements);
   float tol = 1e-5f;
   float expected[16][16] = {0.0f};
 

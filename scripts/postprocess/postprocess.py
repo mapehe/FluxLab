@@ -37,6 +37,7 @@ with open(filename, "rb") as f:
     header_line = f.readline()
     header_data = json.loads(header_line)
 
+    dtype = np.complex128 if header_data["dtype"] == "complex128" else np.complex64
     width = int(header_data["gridWidth"])
     height = int(header_data["gridHeight"])
     iterations = int(header_data["iterations"])
@@ -48,7 +49,7 @@ with open(filename, "rb") as f:
 
     with imageio.get_writer(output_video, fps=30, macro_block_size=None) as writer:
         while current_iter < max_iter:
-            flat_slice = np.fromfile(f, dtype=np.complex64, count=slice_size)
+            flat_slice = np.fromfile(f, dtype=dtype, count=slice_size)
             if flat_slice.size != slice_size:
                 print(f"Warning: Incomplete data found at iteration {current_iter}")
                 break

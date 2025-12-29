@@ -15,7 +15,7 @@ protected:
   virtual void solveStep(int t) = 0;
   virtual int getDownloadFrequency() = 0;
   virtual int getTotalSteps() = 0;
-  virtual void appendFrame(std::vector<cuFloatComplex> &history) = 0;
+  virtual void appendFrame(std::vector<T> &history) = 0;
 
   void step(int t) {
     if (downloadIterator == 0) {

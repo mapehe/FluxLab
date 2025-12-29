@@ -36,7 +36,7 @@ def apply_test_override():
         "gridHeight": 512,
         "threadsPerBlockX": 32,
         "threadsPerBlockY": 32,
-        "downloadFrequency": 1024,
+        "downloadFrequency": 2048,
     }
     with open("configOverrides.json", "w") as f:
         json.dump(config, f, indent=4)
@@ -72,16 +72,16 @@ def test_validate_cuda_kernel_output_against_snapshot():
     """
     with open(SNAPSHOT_PATH, "rb") as snapshot_file:
         with open(OUTPUT_PATH, "rb") as output_file:
-            [width, height, slice_size, current_iter, max_iter, _, _] = (
+            [width, height, slice_size, current_iter, max_iter, dtype, _, _] = (
                 read_binary_snapshots(snapshot_file, output_file)
             )
 
             while current_iter < max_iter:
                 snapshot_flat_slice = np.fromfile(
-                    snapshot_file, dtype=np.complex64, count=slice_size
+                    snapshot_file, dtype=dtype, count=slice_size
                 )
                 output_flat_slice = np.fromfile(
-                    output_file, dtype=np.complex64, count=slice_size
+                    output_file, dtype=dtype, count=slice_size
                 )
 
                 snapshot_array_2d = snapshot_flat_slice.reshape((height, width))

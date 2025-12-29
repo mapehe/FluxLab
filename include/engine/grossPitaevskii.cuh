@@ -7,20 +7,20 @@
 #include "simulationMode.h"
 #include <cufft.h>
 
-class GrossPitaevskiiEngine : public ComputeEngine<cuFloatComplex> {
+class GrossPitaevskiiEngine : public ComputeEngine<cuDoubleComplex> {
 public:
   explicit GrossPitaevskiiEngine(const Params &p);
   ~GrossPitaevskiiEngine() override;
   void solveStep(int t) override;
-  void appendFrame(std::vector<cuFloatComplex> &history) override;
+  void appendFrame(std::vector<cuDoubleComplex> &history) override;
   void saveResults(const std::string &filename) override;
   int getDownloadFrequency() override;
   int getTotalSteps() override;
 
 protected:
-  cuFloatComplex *d_psi;
-  cuFloatComplex *d_V;
-  cuFloatComplex *d_expK;
+  cuDoubleComplex *d_psi;
+  cuDoubleComplex *d_V;
+  cuDoubleComplex *d_expK;
   cufftHandle plan;
 
   std::tuple<GaussianArgs, PotentialArgs, KineticInitArgs, Grid>

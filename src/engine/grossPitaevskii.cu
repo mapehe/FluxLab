@@ -52,11 +52,11 @@ GrossPitaevskiiEngine::GrossPitaevskiiEngine(const Params &p)
                (p.grossPitaevskii.gridHeight + grid.y - 1) / grid.y);
 
   cufftPlan2d(&plan, params.grossPitaevskii.gridHeight,
-              params.grossPitaevskii.gridWidth, CUFFT_C2C);
+              params.grossPitaevskii.gridWidth, CUFFT_Z2Z);
 
   size_t num_pixels =
       params.grossPitaevskii.gridWidth * params.grossPitaevskii.gridHeight;
-  size_t size_bytes = num_pixels * sizeof(cuFloatComplex);
+  size_t size_bytes = num_pixels * sizeof(cuDoubleComplex);
 
   cudaMalloc(&d_psi, size_bytes);
   cudaMemset(d_psi, 0, size_bytes);
@@ -102,14 +102,14 @@ GrossPitaevskiiEngine::~GrossPitaevskiiEngine() {
   cufftDestroy(plan);
 }
 
-void GrossPitaevskiiEngine::appendFrame(std::vector<cuFloatComplex> &history) {
+void GrossPitaevskiiEngine::appendFrame(std::vector<cuDoubleComplex> &history) {
   size_t frame_elements =
       params.grossPitaevskii.gridWidth * params.grossPitaevskii.gridHeight;
-  size_t frame_bytes = frame_elements * sizeof(cuFloatComplex);
+  size_t frame_bytes = frame_elements * sizeof(cuDoubleComplex);
   size_t old_size = history.size();
 
   history.resize(old_size + frame_elements);
-  cuFloatComplex *host_destination = history.data() + old_size;
+  cuDoubleComplex *host_destination = history.data() + old_size;
   cudaMemcpy(host_destination, d_psi, frame_bytes, cudaMemcpyDeviceToHost);
 }
 
@@ -121,11 +121,11 @@ void GrossPitaevskiiEngine::solveStep(int t) {
                                    params.grossPitaevskii.gridHeight,
                                    params.grossPitaevskii.g,
                                    params.grossPitaevskii.dt / 2.0f);
-  cufftExecC2C(plan, d_psi, d_psi, CUFFT_FORWARD);
+  cufftExecZ2Z(plan, d_psi, d_psi, CUFFT_FORWARD);
   evolveMomentumSpace<<<grid, block>>>(
       d_psi, d_expK, params.grossPitaevskii.gridWidth,
       params.grossPitaevskii.gridHeight, fft_scale);
-  cufftExecC2C(plan, d_psi, d_psi, CUFFT_INVERSE);
+  cufftExecZ2Z(plan, d_psi, d_psi, CUFFT_INVERSE);
   evolveRealSpace<<<grid, block>>>(d_psi, d_V, params.grossPitaevskii.gridWidth,
                                    params.grossPitaevskii.gridHeight,
                                    params.grossPitaevskii.g,
@@ -142,12 +142,13 @@ int GrossPitaevskiiEngine::getTotalSteps() {
 }
 
 void GrossPitaevskiiEngine::saveResults(const std::string &filename) {
-  saveToBinaryJSON(
+  saveToBinaryJSON<cuDoubleComplex>(
       {.filename = filename,
        .data = historyData,
        .width = params.grossPitaevskii.gridWidth,
        .height = params.grossPitaevskii.gridHeight,
        .iterations = params.grossPitaevskii.iterations,
        .downloadFrequency = params.grossPitaevskii.downloadFrequency,
+       .dtype = "complex128",
        .header = params.grossPitaevskii});
 }

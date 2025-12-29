@@ -1,7 +1,7 @@
 #include "kernel/quantum/quantumKernels.cuh"
 
-__global__ void initComplexPotential(cuComplex *d_V_tot, PotentialArgs args,
-                                     Grid grid) {
+__global__ void initComplexPotential(cuDoubleComplex *d_V_tot,
+                                     PotentialArgs args, Grid grid) {
   const auto [width, height, dx, dy, trapFreqSq, V_bias, r_0, sigma,
               absorb_strength, absorb_width] = args;
   int idx = get_flat_index({.width = width, .height = height});
@@ -20,5 +20,5 @@ __global__ void initComplexPotential(cuComplex *d_V_tot, PotentialArgs args,
   float val_imag =
       -1.0f * absorb_strength * expf(-(r * r) / (absorb_width * absorb_width));
 
-  d_V_tot[idx] = make_cuComplex(val_real, val_imag);
+  d_V_tot[idx] = make_cuDoubleComplex(val_real, val_imag);
 }

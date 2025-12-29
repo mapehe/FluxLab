@@ -34,28 +34,28 @@ struct KineticInitArgs {
 };
 
 struct SquareMagnitude {
-  __host__ __device__ float operator()(const cuFloatComplex &x) const {
-    return cuCrealf(x) * cuCrealf(x) + cuCimagf(x) * cuCimagf(x);
+  __host__ __device__ float operator()(const cuDoubleComplex &x) const {
+    return x.x * x.x + x.y * x.y;
   }
 };
 
-__global__ void initGaussian(cuFloatComplex *d_psi, GaussianArgs args,
+__global__ void initGaussian(cuDoubleComplex *d_psi, GaussianArgs args,
                              Grid grid);
 
-void normalizePsi(cuFloatComplex *d_psi, dim3 block, dim3 grid,
+void normalizePsi(cuDoubleComplex *d_psi, dim3 block, dim3 grid,
                   GaussianArgs args, Grid gridArgs);
 
-__global__ void initComplexPotential(cuComplex *d_V_tot, PotentialArgs args,
-                                     Grid grid);
+__global__ void initComplexPotential(cuDoubleComplex *d_V_tot,
+                                     PotentialArgs args, Grid grid);
 
-__global__ void initKineticOperator(cuFloatComplex *d_expK,
+__global__ void initKineticOperator(cuDoubleComplex *d_expK,
                                     KineticInitArgs args);
 
-__global__ void evolveRealSpace(cuFloatComplex *d_psi, cuFloatComplex *d_V,
+__global__ void evolveRealSpace(cuDoubleComplex *d_psi, cuDoubleComplex *d_V,
                                 int width, int height, float g, float dt);
 
-__global__ void evolveMomentumSpace(cuFloatComplex *d_psi,
-                                    cuFloatComplex *d_expK, int width,
+__global__ void evolveMomentumSpace(cuDoubleComplex *d_psi,
+                                    cuDoubleComplex *d_expK, int width,
                                     int height, float scale);
 
 #endif

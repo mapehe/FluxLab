@@ -43,11 +43,13 @@ int TestEngine::getDownloadFrequency() { return params.test.downloadFrequency; }
 int TestEngine::getTotalSteps() { return params.test.iterations; }
 
 void TestEngine::saveResults(const std::string &filename) {
-  saveToBinaryJSON({.filename = filename,
-                    .data = historyData,
-                    .width = params.test.gridWidth,
-                    .height = params.test.gridHeight,
-                    .iterations = params.test.iterations,
-                    .downloadFrequency = params.test.downloadFrequency,
-                    .header = params.test});
+  saveToBinaryJSON<cuFloatComplex>(
+      {.filename = filename,
+       .data = historyData,
+       .width = params.test.gridWidth,
+       .height = params.test.gridHeight,
+       .iterations = params.test.iterations,
+       .downloadFrequency = params.test.downloadFrequency,
+       .dtype = "complex64",
+       .header = params.test});
 }

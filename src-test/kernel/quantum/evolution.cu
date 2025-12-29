@@ -9,7 +9,7 @@
 
 class EvolutionTest : public ::testing::Test {
 protected:
-  cuFloatComplex *d_expK = nullptr;
+  cuDoubleComplex *d_expK = nullptr;
   int width = 128;
   int height = 128;
   int numElements;
@@ -28,7 +28,7 @@ protected:
             .dt = 0.1f};
 
     ASSERT_CUDA_SUCCESS(
-        cudaMalloc(&d_expK, numElements * sizeof(cuFloatComplex)));
+        cudaMalloc(&d_expK, numElements * sizeof(cuDoubleComplex)));
   }
 
   void TearDown() override {
@@ -39,23 +39,23 @@ protected:
     cudaDeviceReset();
   }
 
-  void uploadData(const std::vector<cuFloatComplex> &h_data) {
+  void uploadData(const std::vector<cuDoubleComplex> &h_data) {
     ASSERT_EQ(h_data.size(), numElements) << "Host data size mismatch";
     ASSERT_CUDA_SUCCESS(cudaMemcpy(d_expK, h_data.data(),
-                                   numElements * sizeof(cuFloatComplex),
+                                   numElements * sizeof(cuDoubleComplex),
                                    cudaMemcpyHostToDevice));
   }
 
-  void downloadData(std::vector<cuFloatComplex> &h_data) {
+  void downloadData(std::vector<cuDoubleComplex> &h_data) {
     h_data.resize(numElements);
     ASSERT_CUDA_SUCCESS(cudaMemcpy(h_data.data(), d_expK,
-                                   numElements * sizeof(cuFloatComplex),
+                                   numElements * sizeof(cuDoubleComplex),
                                    cudaMemcpyDeviceToHost));
   }
 };
 
 TEST_F(EvolutionTest, InitKineticOperatorTest) {
-  std::vector<cuFloatComplex> h_expK(numElements);
+  std::vector<cuDoubleComplex> h_expK(numElements);
   float tol = 1e-5f;
   std::vector<std::complex<float>> expected(width * height);
 

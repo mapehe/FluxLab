@@ -9,26 +9,28 @@
 
 using json = nlohmann::json;
 
-struct SaveOptions {
+template <typename ComplexT> struct SaveOptions {
   std::string filename;
-  const std::vector<cuFloatComplex> &data;
+  const std::vector<ComplexT> &data;
   int width;
   int height;
   int iterations;
   int downloadFrequency;
+  std::string dtype;
   json header;
 };
 
-inline void saveToBinaryJSON(const SaveOptions &opts) {
+template <typename ComplexT>
+inline void saveToBinaryJSON(const SaveOptions<ComplexT> &opts) {
   const auto &[filename, data, width, height, iterations, downloadFrequency,
-               header] = opts;
+               dtype, header] = opts;
 
   std::ofstream out(filename, std::ios::out | std::ios::binary);
   if (!out)
     throw std::runtime_error("Could not open file");
 
   json tmp = header;
-  json version = json({{"commit", COMMIT_HASH}});
+  json version = json({{"commit", COMMIT_HASH}, {"dtype", dtype}});
   tmp.merge_patch(version);
   std::string headerStr = tmp.dump();
 
@@ -36,7 +38,8 @@ inline void saveToBinaryJSON(const SaveOptions &opts) {
   out.write("\n", 1);
 
   out.write(reinterpret_cast<const char *>(data.data()),
-            data.size() * sizeof(cuFloatComplex));
+            data.size() * sizeof(ComplexT));
+
   out.close();
 }
 
