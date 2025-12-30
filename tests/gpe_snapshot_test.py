@@ -13,7 +13,7 @@ timestamp_str = "gpe_test_output_%s" % time.strftime("%Y%m%d_%H%M%S")
 OUTPUT_PATH = ROOT_DIR / timestamp_str
 SNAPSHOT_PATH = ROOT_DIR / "tests/snapshots/gpe_snapshot"
 
-RTOL = 1e-2
+RTOL = 1e-4
 ATOL = 1e-8
 
 
@@ -36,7 +36,7 @@ def apply_test_override():
         "gridHeight": 512,
         "threadsPerBlockX": 32,
         "threadsPerBlockY": 32,
-        "downloadFrequency": 512,
+        "downloadFrequency": 1024,
         "L": 1.0,
         "x0": 0.15,
         "y0": 0.15,
@@ -83,16 +83,16 @@ def test_wavefunction_evolution_fidelity():
     """
     with open(SNAPSHOT_PATH, "rb") as snapshot_file:
         with open(OUTPUT_PATH, "rb") as output_file:
-            [width, height, slice_size, dx, dy, current_iter, max_iter] = (
+            [width, height, slice_size, dx, dy, current_iter, max_iter, dtype] = (
                 read_gpe_snapshots(snapshot_file, output_file)
             )
 
             while current_iter < max_iter:
                 snapshot_flat_slice = np.fromfile(
-                    snapshot_file, dtype=np.complex64, count=slice_size
+                    snapshot_file, dtype=dtype, count=slice_size
                 )
                 output_flat_slice = np.fromfile(
-                    output_file, dtype=np.complex64, count=slice_size
+                    output_file, dtype=dtype, count=slice_size
                 )
 
                 snapshot_array_2d = snapshot_flat_slice.reshape((height, width))
@@ -121,12 +121,12 @@ def test_wavefunction_normalization():
     """
     with open(OUTPUT_PATH, "rb") as output_file:
         with open(SNAPSHOT_PATH, "rb") as snapshot_file:
-            [width, height, slice_size, dx, dy, current_iter, max_iter] = (
+            [width, height, slice_size, dx, dy, current_iter, max_iter, dtype] = (
                 read_gpe_snapshots(snapshot_file, output_file)
             )
             while current_iter < max_iter:
                 output_flat_slice = np.fromfile(
-                    output_file, dtype=np.complex64, count=slice_size
+                    output_file, dtype=dtype, count=slice_size
                 )
 
                 output_array_2d = output_flat_slice.reshape((height, width))

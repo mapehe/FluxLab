@@ -26,7 +26,7 @@ public:
                                       .amp = 1.0f,
                                       .omega = 0.0f,
                                       .trapStr = 1e3f,
-                                      .dt = 6e-7f,
+                                      .dt = 1e-8f,
                                       .g = 10e3f,
                                       .V_bias = 0.0f,
                                       .r_0 = 0.0f,
@@ -44,13 +44,13 @@ public:
   void injectDeviceData(float real, float imag) {
     size_t size =
         params.grossPitaevskii.gridWidth * params.grossPitaevskii.gridHeight;
-    std::vector<cuFloatComplex> host_data(size);
+    std::vector<cuDoubleComplex> host_data(size);
 
     for (auto &val : host_data) {
-      val = make_cuFloatComplex(real, imag);
+      val = make_cuDoubleComplex(real, imag);
     }
 
-    cudaMemcpy(this->d_psi, host_data.data(), size * sizeof(cuFloatComplex),
+    cudaMemcpy(this->d_psi, host_data.data(), size * sizeof(cuDoubleComplex),
                cudaMemcpyHostToDevice);
   }
 };
@@ -60,7 +60,7 @@ TEST_F(GrossPitaevskiiEngineTest, AppendFrame_CopiesCorrectDataFromDevice) {
   float expected_i = 2.0f;
   injectDeviceData(expected_r, expected_i);
 
-  std::vector<cuFloatComplex> history;
+  std::vector<cuDoubleComplex> history;
 
   this->appendFrame(history);
 
@@ -87,10 +87,10 @@ TEST_F(GrossPitaevskiiEngineTest,
   float dy = L_y / (float)height;
   float cell_area = dx * dy;
 
-  std::vector<cuFloatComplex> host_psi(num_elements);
+  std::vector<cuDoubleComplex> host_psi(num_elements);
 
   cudaMemcpy(host_psi.data(), this->d_psi,
-             num_elements * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
+             num_elements * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
 
   float total_probability = 0.0f;
   for (const auto &val : host_psi) {
@@ -108,6 +108,7 @@ TEST_F(GrossPitaevskiiEngineTest, SolveStep_ConservesWavefunctionNorm) {
   size_t width = params.grossPitaevskii.gridWidth;
   size_t height = params.grossPitaevskii.gridHeight;
   size_t num_elements = width * height;
+  int iterations = 10000;
 
   float L_x = params.grossPitaevskii.L;
   float L_y = params.grossPitaevskii.L;
@@ -116,18 +117,18 @@ TEST_F(GrossPitaevskiiEngineTest, SolveStep_ConservesWavefunctionNorm) {
   float dy = L_y / (float)height;
   float cell_area = dx * dy;
 
-  std::vector<cuFloatComplex> host_psi_0(num_elements);
-  std::vector<cuFloatComplex> host_psi(num_elements);
+  std::vector<cuDoubleComplex> host_psi_0(num_elements);
+  std::vector<cuDoubleComplex> host_psi(num_elements);
 
   cudaMemcpy(host_psi_0.data(), this->d_psi,
-             num_elements * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
+             num_elements * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
 
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < iterations; i++) {
     this->solveStep(i);
   }
 
   cudaMemcpy(host_psi.data(), this->d_psi,
-             num_elements * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
+             num_elements * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
 
   float total_probability = 0.0f;
   float total_diff_sq = 0.0f;
@@ -164,17 +165,18 @@ TEST_F(GrossPitaevskiiEngineTest, SolveStep_ConservesEnergy) {
   float cell_area = dx * dy;
   float g_interaction = params.grossPitaevskii.g; // Interaction strength
 
-  std::vector<cuFloatComplex> host_psi_0(num_elements);
-  std::vector<cuFloatComplex> host_psi_final(num_elements);
+  std::vector<cuDoubleComplex> host_psi_0(num_elements);
+  std::vector<cuDoubleComplex> host_psi_final(num_elements);
 
-  auto calculate_energy = [&](const std::vector<cuFloatComplex> &psi) -> float {
+  auto calculate_energy =
+      [&](const std::vector<cuDoubleComplex> &psi) -> float {
     float total_energy = 0.0f;
 
     for (int y = 0; y < height; ++y) {
       for (int x = 0; x < width; ++x) {
         int idx = y * width + x;
 
-        cuFloatComplex val = psi[idx];
+        cuDoubleComplex val = psi[idx];
         float abs_sq = (val.x * val.x) + (val.y * val.y);
 
         float E_interaction = 0.5f * g_interaction * (abs_sq * abs_sq);
@@ -184,13 +186,13 @@ TEST_F(GrossPitaevskiiEngineTest, SolveStep_ConservesEnergy) {
         int idx_u = ((y - 1 + height) % height) * width + x; // Up
         int idx_d = ((y + 1) % height) * width + x;          // Down
 
-        cuFloatComplex sum_neighbors;
+        cuDoubleComplex sum_neighbors;
         sum_neighbors.x =
             psi[idx_l].x + psi[idx_r].x + psi[idx_u].x + psi[idx_d].x;
         sum_neighbors.y =
             psi[idx_l].y + psi[idx_r].y + psi[idx_u].y + psi[idx_d].y;
 
-        cuFloatComplex laplacian;
+        cuDoubleComplex laplacian;
         laplacian.x = (sum_neighbors.x - 4.0f * val.x) / (dx * dx);
         laplacian.y = (sum_neighbors.y - 4.0f * val.y) / (dx * dx);
 
@@ -205,7 +207,7 @@ TEST_F(GrossPitaevskiiEngineTest, SolveStep_ConservesEnergy) {
   };
 
   cudaMemcpy(host_psi_0.data(), this->d_psi,
-             num_elements * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
+             num_elements * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
   float energy_initial = calculate_energy(host_psi_0);
 
   for (int i = 0; i < 20; i++) {
@@ -213,7 +215,7 @@ TEST_F(GrossPitaevskiiEngineTest, SolveStep_ConservesEnergy) {
   }
 
   cudaMemcpy(host_psi_final.data(), this->d_psi,
-             num_elements * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
+             num_elements * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
   float energy_final = calculate_energy(host_psi_final);
 
   float energy_diff = std::abs(energy_final - energy_initial);

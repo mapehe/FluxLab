@@ -4,7 +4,7 @@
 #include <thrust/functional.h>
 #include <thrust/transform_reduce.h>
 
-void normalizePsi(cuFloatComplex *d_psi, dim3 block, dim3 grid,
+void normalizePsi(cuDoubleComplex *d_psi, dim3 block, dim3 grid,
                   GaussianArgs args, Grid gridArgs) {
   const auto [width, height, L_x, L_y] = gridArgs;
   float dx = L_x / width;
@@ -12,7 +12,7 @@ void normalizePsi(cuFloatComplex *d_psi, dim3 block, dim3 grid,
 
   int numElements = width * height;
 
-  thrust::device_ptr<cuFloatComplex> th_psi(d_psi);
+  thrust::device_ptr<cuDoubleComplex> th_psi(d_psi);
   float sumSq =
       thrust::transform_reduce(th_psi, th_psi + numElements, SquareMagnitude(),
                                0.0f, thrust::plus<float>());
@@ -25,15 +25,15 @@ void normalizePsi(cuFloatComplex *d_psi, dim3 block, dim3 grid,
   float scaleFactor = 1.0f / sqrtf(currentProbability);
 
   thrust::transform(th_psi, th_psi + numElements, th_psi,
-                    [scaleFactor] __device__(cuFloatComplex val) {
-                      return make_cuFloatComplex(val.x * scaleFactor,
-                                                 val.y * scaleFactor);
+                    [scaleFactor] __device__(cuDoubleComplex val) {
+                      return make_cuDoubleComplex(val.x * scaleFactor,
+                                                  val.y * scaleFactor);
                     });
 
   cudaDeviceSynchronize();
 }
 
-__global__ void initGaussian(cuFloatComplex *d_psi, GaussianArgs args,
+__global__ void initGaussian(cuDoubleComplex *d_psi, GaussianArgs args,
                              Grid grid) {
   const auto [width, height, L_x, L_y] = grid;
   const auto [x0, y0, sigma, amplitude] = args;
@@ -50,5 +50,5 @@ __global__ void initGaussian(cuFloatComplex *d_psi, GaussianArgs args,
 
   float envelope = amplitude * expf(-dist_sq / (2.0f * sigma * sigma));
 
-  d_psi[idx] = make_cuFloatComplex(envelope, 0);
+  d_psi[idx] = make_cuDoubleComplex(envelope, 0);
 }

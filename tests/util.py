@@ -22,6 +22,8 @@ def read_binary_snapshots(snapshot_file, output_file):
     header_line = snapshot_file.readline()
     snapshot_header_data = json.loads(header_line)
 
+    dtype = np.complex128 if snapshot_header_data["dtype"] == "complex128" else np.complex64
+
     snapshot_width = int(snapshot_header_data["gridWidth"])
     snapshot_height = int(snapshot_header_data["gridHeight"])
     snapshot_iterations = int(snapshot_header_data["iterations"])
@@ -54,6 +56,7 @@ def read_binary_snapshots(snapshot_file, output_file):
         slice_size,
         current_iter,
         max_iter,
+        dtype,
         snapshot_header_data,
         output_header_data,
     ]
@@ -66,6 +69,7 @@ def read_gpe_snapshots(snapshot_file, output_file):
         slice_size,
         current_iter,
         max_iter,
+        dtype,
         snapshot_header_data,
         output_header_data,
     ] = read_binary_snapshots(snapshot_file, output_file)
@@ -77,4 +81,4 @@ def read_gpe_snapshots(snapshot_file, output_file):
     dx = L / width
     dy = L / height
 
-    return [width, height, slice_size, dx, dy, current_iter, max_iter]
+    return [width, height, slice_size, dx, dy, current_iter, max_iter, dtype]
