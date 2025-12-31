@@ -56,12 +56,28 @@ struct GrossPitaevskiiParams {
                                  sigma2, absorbStrength, absorbWidth)
 };
 
+struct XYModelParams {
+  int iterations;
+  int gridWidth;
+  int gridHeight;
+  int threadsPerBlockX;
+  int threadsPerBlockY;
+  int downloadFrequency;
+  float dt;
+  float T;
+
+  NLOHMANN_DEFINE_TYPE_INTRUSIVE(XYModelParams, iterations, gridWidth,
+                                 gridHeight, threadsPerBlockY, threadsPerBlockY,
+                                 dt, T, downloadFrequency)
+};
+
 struct Params {
   std::string output;
   SimulationMode simulationMode;
 
   TestParams test;
   GrossPitaevskiiParams grossPitaevskii;
+  XYModelParams xyModel;
 };
 
 Params preprocessParams(const json &j);

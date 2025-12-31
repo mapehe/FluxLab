@@ -22,7 +22,9 @@ def read_binary_snapshots(snapshot_file, output_file):
     header_line = snapshot_file.readline()
     snapshot_header_data = json.loads(header_line)
 
-    dtype = np.complex128 if snapshot_header_data["dtype"] == "complex128" else np.complex64
+    dtype = (
+        np.complex128 if snapshot_header_data["dtype"] == "complex128" else np.complex64
+    )
 
     snapshot_width = int(snapshot_header_data["gridWidth"])
     snapshot_height = int(snapshot_header_data["gridHeight"])
