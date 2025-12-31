@@ -10,10 +10,9 @@ TestEngine::TestEngine(const Params &p) : ComputeEngine(p), d_grid(nullptr) {
   }
   cudaMemset(d_grid, 0, size);
 
-  grid = dim3(p.grossPitaevskii.threadsPerBlockX,
-              p.grossPitaevskii.threadsPerBlockY);
-  block = dim3((p.grossPitaevskii.gridWidth + grid.x - 1) / grid.x,
-               (p.grossPitaevskii.gridHeight + grid.y - 1) / grid.y);
+  grid = dim3(p.test.threadsPerBlockX, p.test.threadsPerBlockY);
+  block = dim3((p.test.gridWidth + grid.x - 1) / grid.x,
+               (p.test.gridHeight + grid.y - 1) / grid.y);
 }
 
 TestEngine::~TestEngine() {

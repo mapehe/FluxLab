@@ -33,5 +33,15 @@
 
     "dt": 6e-7,
     "g": 10e1
+  },
+  "xyModel": {
+    "iterations": 8192,
+    "gridWidth": 512,
+    "gridHeight": 512,
+    "threadsPerBlockX": 32,
+    "threadsPerBlockY": 32,
+    "downloadFrequency": 32,
+    "dt": 5e-4,
+    "T": 0
   }
 }

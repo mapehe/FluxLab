@@ -57,7 +57,8 @@ protected:
                                             .r_0 = 0.05f,
                                             .sigma2 = 0.025f,
                                             .absorbStrength = 10e3f,
-                                            .absorbWidth = 0.025f}};
+                                            .absorbWidth = 0.025f},
+                        .xyModel = {}};
 };
 
 TEST_F(ComputeEngineTest, RunExecutesCorrectNumberOfSteps) {

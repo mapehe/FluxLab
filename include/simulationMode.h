@@ -5,13 +5,14 @@
 
 using json = nlohmann::json;
 
-enum class SimulationMode { Test, GrossPitaevskii };
+enum class SimulationMode { Test, GrossPitaevskii, XYModel };
 
 struct SimulationModeMap {
   static const std::unordered_map<std::string, SimulationMode> &get() {
     static const std::unordered_map<std::string, SimulationMode> map{
         {"test", SimulationMode::Test},
         {"grossPitaevskii", SimulationMode::GrossPitaevskii},
+        {"xyModel", SimulationMode::XYModel},
     };
     return map;
   }

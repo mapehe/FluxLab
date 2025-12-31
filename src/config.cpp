@@ -33,6 +33,7 @@ Params preprocessParams(const json &j) {
 
   const auto &testJson = j.at("test");
   const auto &gpJson = j.at("grossPitaevskii");
+  const auto &xyModelJson = j.at("xyModel");
 
   return Params{
       .output = parse<std::string>(j, "output", any, ""),
@@ -51,37 +52,53 @@ Params preprocessParams(const json &j) {
                   parse<int>(testJson, "downloadFrequency", is_pos, pos_err),
           },
 
-      .grossPitaevskii = {
-          .iterations = parse<int>(gpJson, "iterations", is_pos, pos_err),
-          .gridWidth = parse<int>(gpJson, "gridWidth", is_pos, pos_err),
-          .gridHeight = parse<int>(gpJson, "gridHeight", is_pos, pos_err),
+      .grossPitaevskii =
+          {
+              .iterations = parse<int>(gpJson, "iterations", is_pos, pos_err),
+              .gridWidth = parse<int>(gpJson, "gridWidth", is_pos, pos_err),
+              .gridHeight = parse<int>(gpJson, "gridHeight", is_pos, pos_err),
+              .threadsPerBlockX =
+                  parse<int>(gpJson, "threadsPerBlockX", is_pos, pos_err),
+              .threadsPerBlockY =
+                  parse<int>(gpJson, "threadsPerBlockY", is_pos, pos_err),
+              .downloadFrequency =
+                  parse<int>(gpJson, "downloadFrequency", is_pos, pos_err),
+
+              .L = parse<float>(gpJson, "L", is_pos, pos_err),
+              .sigma = parse<float>(gpJson, "sigma", is_pos, pos_err),
+              .x0 = parse<float>(gpJson, "x0", any, ""),
+              .y0 = parse<float>(gpJson, "y0", any, ""),
+              .kx = parse<float>(gpJson, "kx", any, ""),
+              .ky = parse<float>(gpJson, "ky", any, ""),
+              .amp = parse<float>(gpJson, "amp", any, ""),
+              .omega = parse<float>(gpJson, "omega", is_non_neg, non_neg_err),
+              .trapStr =
+                  parse<float>(gpJson, "trapStr", is_non_neg, non_neg_err),
+
+              .dt = parse<float>(gpJson, "dt", is_pos, pos_err),
+              .g = parse<float>(gpJson, "g", any, ""),
+
+              .V_bias = parse<float>(gpJson, "V_bias", is_non_neg, non_neg_err),
+              .r_0 = parse<float>(gpJson, "r_0", is_non_neg, non_neg_err),
+              .sigma2 = parse<float>(gpJson, "sigma2", is_non_neg, non_neg_err),
+              .absorbStrength = parse<float>(gpJson, "absorbStrength",
+                                             is_non_neg, non_neg_err),
+              .absorbWidth =
+                  parse<float>(gpJson, "absorbWidth", is_non_neg, non_neg_err),
+
+          },
+
+      .xyModel = {
+          .iterations = parse<int>(xyModelJson, "iterations", is_pos, pos_err),
+          .gridWidth = parse<int>(xyModelJson, "gridWidth", is_pos, pos_err),
+          .gridHeight = parse<int>(xyModelJson, "gridHeight", is_pos, pos_err),
           .threadsPerBlockX =
-              parse<int>(gpJson, "threadsPerBlockX", is_pos, pos_err),
+              parse<int>(xyModelJson, "threadsPerBlockX", is_pos, pos_err),
           .threadsPerBlockY =
-              parse<int>(gpJson, "threadsPerBlockY", is_pos, pos_err),
+              parse<int>(xyModelJson, "threadsPerBlockY", is_pos, pos_err),
           .downloadFrequency =
-              parse<int>(gpJson, "downloadFrequency", is_pos, pos_err),
-
-          .L = parse<float>(gpJson, "L", is_pos, pos_err),
-          .sigma = parse<float>(gpJson, "sigma", is_pos, pos_err),
-          .x0 = parse<float>(gpJson, "x0", any, ""),
-          .y0 = parse<float>(gpJson, "y0", any, ""),
-          .kx = parse<float>(gpJson, "kx", any, ""),
-          .ky = parse<float>(gpJson, "ky", any, ""),
-          .amp = parse<float>(gpJson, "amp", any, ""),
-          .omega = parse<float>(gpJson, "omega", is_non_neg, non_neg_err),
-          .trapStr = parse<float>(gpJson, "trapStr", is_non_neg, non_neg_err),
-
-          .dt = parse<float>(gpJson, "dt", is_pos, pos_err),
-          .g = parse<float>(gpJson, "g", any, ""),
-
-          .V_bias = parse<float>(gpJson, "V_bias", is_non_neg, non_neg_err),
-          .r_0 = parse<float>(gpJson, "r_0", is_non_neg, non_neg_err),
-          .sigma2 = parse<float>(gpJson, "sigma2", is_non_neg, non_neg_err),
-          .absorbStrength =
-              parse<float>(gpJson, "absorbStrength", is_non_neg, non_neg_err),
-          .absorbWidth =
-              parse<float>(gpJson, "absorbWidth", is_non_neg, non_neg_err),
-
+              parse<int>(xyModelJson, "downloadFrequency", is_pos, pos_err),
+          .dt = parse<float>(xyModelJson, "dt", is_pos, pos_err),
+          .T = parse<float>(xyModelJson, "T", any, ""),
       }};
 }

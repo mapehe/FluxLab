@@ -32,7 +32,8 @@ public:
                                       .r_0 = 0.0f,
                                       .sigma2 = 0.0f,
                                       .absorbStrength = 0.0f,
-                                      .absorbWidth = 0.0f}};
+                                      .absorbWidth = 0.0f},
+                  .xyModel = {}};
   }
 
   GrossPitaevskiiEngineTest() : GrossPitaevskiiEngine(createTestParams()) {}
