@@ -43,6 +43,10 @@ json parseArguments(int argc, char **argv) {
                                            true, "", "string");
     cmd.add(configArg);
 
+    TCLAP::SwitchArg mlArg("l", "machine-learning",
+                           "Run FluxLab in Machine Learning mode", false);
+    cmd.add(mlArg);
+
     std::vector<std::string> allowedModes;
     for (const auto &pair : SimulationModeMap::get()) {
       allowedModes.push_back(pair.first);
@@ -55,7 +59,8 @@ json parseArguments(int argc, char **argv) {
     cmd.parse(argc, argv);
     return json{{"output", outputArg.getValue()},
                 {"configFile", configArg.getValue()},
-                {"simulationMode", modeArg.getValue()}};
+                {"simulationMode", modeArg.getValue()},
+                {"machineLearningMode", mlArg.getValue()}};
 
   } catch (TCLAP::ArgException &e) {
     std::cerr << "error: " << e.error() << " for arg " << e.argId()

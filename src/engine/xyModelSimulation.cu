@@ -1,8 +1,21 @@
 #include "engine/xyModelSimulation.cuh"
-#include "io.h"
-#include "kernel/langevin/langevin.cuh"
-#include "kernel/random.cuh"
-#include <cmath>
+
+void XYModelEngine::computeObservables(tmpGrid gridParams) {
+  calculate_energy_kernel<<<grid, block>>>(d_grid, d_neighbors, d_offsets,
+                                           d_degrees, d_energy_out, gridSize,
+                                           gridParams);
+  cudaDeviceSynchronize();
+
+  thrust::device_ptr<double> t_energy_ptr(d_energy_out);
+
+  totalEnergy = thrust::reduce(t_energy_ptr, t_energy_ptr + gridSize, 0.0,
+                               thrust::plus<double>());
+
+  thrust::device_ptr<cuDoubleComplex> dev_ptr(d_grid);
+  totalMagnetization =
+      thrust::reduce(dev_ptr, dev_ptr + gridSize,
+                     make_cuDoubleComplex(0.0, 0.0), ComplexSum());
+}
 
 XYModelEngine::XYModelEngine(const Params &p)
     : ComputeEngine(p), d_grid(nullptr) {
@@ -23,6 +36,7 @@ XYModelEngine::XYModelEngine(const Params &p)
   auto gridHeight = p.xyModel.gridHeight;
   gridSize = p.xyModel.gridWidth * p.xyModel.gridHeight;
 
+  cudaMalloc(&d_energy_out, gridSize * sizeof(double));
   cudaMalloc((void **)&d_states, gridWidth * gridWidth * sizeof(curandState));
 
   init_rng_kernel<<<grid, block>>>(d_states, time(NULL), gridWidth);
@@ -77,6 +91,9 @@ XYModelEngine::XYModelEngine(const Params &p)
              cudaMemcpyHostToDevice);
   cudaMemcpy(d_degrees, h_degrees.data(), gridSize * sizeof(int),
              cudaMemcpyHostToDevice);
+
+  computeObservables(
+      {.width = params.xyModel.gridWidth, .height = params.xyModel.gridHeight});
 }
 
 XYModelEngine::~XYModelEngine() {
@@ -87,6 +104,7 @@ XYModelEngine::~XYModelEngine() {
     cudaFree(d_neighbors);
     cudaFree(d_offsets);
     cudaFree(d_degrees);
+    cudaFree(d_energy_out);
     d_grid = nullptr;
   }
 }
@@ -102,11 +120,15 @@ void XYModelEngine::appendFrame(std::vector<cuDoubleComplex> &history) {
 }
 
 void XYModelEngine::solveStep(int t) {
-  const double T = params.xyModel.T * std::exp(-params.xyModel.tDecay * t);
+  if (!params.machineLearningMode) {
+    T = params.xyModel.T * std::exp(-params.xyModel.tDecay * t);
+  }
   cudaMemcpy(d_grid_tmp, d_grid, bufferSize, cudaMemcpyDeviceToDevice);
   langevin_complex_update<<<grid, block>>>(
       d_grid_tmp, d_grid, d_neighbors, d_offsets, d_degrees, d_states, T,
       params.xyModel.dt, gridSize,
+      {.width = params.xyModel.gridWidth, .height = params.xyModel.gridHeight});
+  computeObservables(
       {.width = params.xyModel.gridWidth, .height = params.xyModel.gridHeight});
   cudaError_t err = cudaGetLastError();
   if (err != cudaSuccess) {

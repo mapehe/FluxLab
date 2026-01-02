@@ -75,6 +75,7 @@ struct XYModelParams {
 struct Params {
   std::string output;
   SimulationMode simulationMode;
+  bool machineLearningMode;
 
   TestParams test;
   GrossPitaevskiiParams grossPitaevskii;

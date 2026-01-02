@@ -1,6 +1,7 @@
 #ifndef UTIL_KERNELS
 #define UTIL_KERNELS
 #include <assert.h>
+#include <cuComplex.h>
 
 struct tmpGrid {
   int width;
@@ -39,5 +40,12 @@ __device__ __forceinline__ Coords get_normalized_coords(int i, int j,
 
   return {.x = L_x * x_uc, .y = L_y * y_uc};
 }
+
+struct ComplexSum {
+  __host__ __device__ cuDoubleComplex
+  operator()(const cuDoubleComplex &a, const cuDoubleComplex &b) const {
+    return make_cuDoubleComplex(a.x + b.x, a.y + b.y);
+  }
+};
 
 #endif

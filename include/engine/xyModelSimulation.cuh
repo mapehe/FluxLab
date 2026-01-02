@@ -3,8 +3,15 @@
 
 #include "config.h"
 #include "engine/computeEngine.cuh"
+#include "io.h"
+#include "kernel/langevin/langevin.cuh"
+#include "kernel/random.cuh"
 #include "kernel/testKernel.cuh"
+#include <cmath>
 #include <curand_kernel.h>
+#include <thrust/device_ptr.h>
+#include <thrust/functional.h>
+#include <thrust/transform_reduce.h>
 
 class XYModelEngine : public ComputeEngine<cuDoubleComplex> {
 public:
@@ -16,8 +23,13 @@ public:
   int getDownloadFrequency() override;
   int getTotalSteps() override;
 
-private:
+  // Need to access this from the ML model
   cuDoubleComplex *d_grid;
+  double T;
+  double totalEnergy;
+  cuDoubleComplex totalMagnetization;
+
+private:
   cuDoubleComplex *d_grid_tmp;
   curandState *d_states;
   dim3 grid;
@@ -26,6 +38,9 @@ private:
   int gridSize;
 
   int *d_neighbors, *d_offsets, *d_degrees;
+  double *d_energy_out;
+
+  void computeObservables(tmpGrid gridParams);
 };
 
 #endif
