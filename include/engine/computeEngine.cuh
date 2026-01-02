@@ -43,4 +43,14 @@ public:
   }
 };
 
+template <typename T, typename U>
+class ObservableComputeEngine : public ComputeEngine<T> {
+protected:
+    U observable;
+
+public:
+    ObservableComputeEngine(const Params &p) : ComputeEngine<T>(p) {};
+    virtual ~ObservableComputeEngine() = default;
+};
+
 #endif
