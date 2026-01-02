@@ -35,7 +35,7 @@
     "g": 10e1
   },
   "xyModel": {
-    "iterations": 65536,
+    "iterations": 16384,
     "gridWidth": 512,
     "gridHeight": 512,
     "threadsPerBlockX": 32,

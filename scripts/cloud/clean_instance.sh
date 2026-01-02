@@ -6,7 +6,7 @@ source load_env.sh
 gcloud compute ssh cuda-gpu --zone=$ZONE --command "$(cat << EOF
 set -e
 
-rm -rf *
+rm -rf build_source
 
 EOF
 )"

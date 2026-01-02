@@ -12,13 +12,12 @@ protected:
 
   std::vector<T> historyData;
 
-  virtual void solveStep(int t) = 0;
   virtual int getDownloadFrequency() = 0;
   virtual int getTotalSteps() = 0;
   virtual void appendFrame(std::vector<T> &history) = 0;
 
   void step(int t) {
-    if (downloadIterator == 0) {
+    if (downloadIterator == 0 && !params.machineLearningMode) {
       appendFrame(historyData);
     }
     downloadIterator = (downloadIterator + 1) % getDownloadFrequency();
@@ -34,6 +33,7 @@ protected:
 
 public:
   ComputeEngine(const Params &p) : params(p), downloadIterator(0) {};
+  virtual void solveStep(int t) = 0;
   virtual ~ComputeEngine() = default;
   virtual void saveResults(const std::string &filename) = 0;
   void run() {

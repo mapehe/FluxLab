@@ -39,6 +39,17 @@ When connected you need to install `libgtest-dev` to enable unit testing.
 sudo apt-get update
 sudo apt-get install -y libgtest-dev libgmock-dev
 ```
+Then install torch
+```bash
+mkdir -p $HOME/libs && cd $HOME/libs
+wget -c https://download.pytorch.org/libtorch/cu124/libtorch-cxx11-abi-shared-with-deps-2.5.1%2Bcu124.zip
+unzip -q libtorch-*.zip
+rm libtorch-*.zip
+cd -
+
+echo 'export CMAKE_PREFIX_PATH=$HOME/libs/libtorch:$CMAKE_PREFIX_PATH' >> ~/.bashrc
+source ~/.bashrc
+```
 
 ### 3. Run
 

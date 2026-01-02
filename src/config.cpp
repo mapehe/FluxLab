@@ -38,6 +38,7 @@ Params preprocessParams(const json &j) {
   return Params{
       .output = parse<std::string>(j, "output", any, ""),
       .simulationMode = parse<SimulationMode>(j, "simulationMode", mode_ok, ""),
+      .machineLearningMode = parse<bool>(j, "machineLearningMode", any, ""),
 
       .test =
           {

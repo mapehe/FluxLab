@@ -11,6 +11,7 @@ HAS_UPLOAD_VIDEO=false
 OUTPUT_FILE=""
 SIMULATION_MODE=""
 CONFIG_FILE=""
+MACHINE_LEARNING=""
 COMMIT_HASH=$(git rev-parse --short HEAD)
 
 while [[ "$#" -gt 0 ]]; do
@@ -31,6 +32,10 @@ while [[ "$#" -gt 0 ]]; do
             ;;
         --config) 
             CONFIG_FILE="$2" 
+            shift
+            ;;
+        --machine-learning) 
+            MACHINE_LEARNING="$1"
             shift
             ;;
         *) 
@@ -56,10 +61,10 @@ rsync -avz \
 
 if $HAS_UPLOAD; then
     gcloud compute ssh --zone=$ZONE cuda-gpu \
-        --command "bash -lc 'export COMMIT_HASH=${COMMIT_HASH}; cd build_source && make && ./bin/main -o ${OUTPUT_FILE} -m ${SIMULATION_MODE} -c ${CONFIG_FILE} && gcloud storage cp ${OUTPUT_FILE} gs://${STORAGE_BUCKET}/${OUTPUT_FILE}'"
+        --command "bash -lc 'export COMMIT_HASH=${COMMIT_HASH}; cd build_source && make && ./bin/main -o ${OUTPUT_FILE} -m ${SIMULATION_MODE} ${MACHINE_LEARNING} -c ${CONFIG_FILE} && gcloud storage cp ${OUTPUT_FILE} gs://${STORAGE_BUCKET}/${OUTPUT_FILE}'"
 else
     gcloud compute ssh --zone=$ZONE cuda-gpu \
-        --command "bash -lc 'export COMMIT_HASH=${COMMIT_HASH}; cd build_source && make && ./bin/main -o ${OUTPUT_FILE} -m ${SIMULATION_MODE} -c ${CONFIG_FILE}'"
+      --command "bash -lc 'export COMMIT_HASH=${COMMIT_HASH}; cd build_source && make && ./bin/main -o ${OUTPUT_FILE} -m ${SIMULATION_MODE} ${MACHINE_LEARNING} -c ${CONFIG_FILE}'"
 fi
 
 if $HAS_UPLOAD_VIDEO; then
