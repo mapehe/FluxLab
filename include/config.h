@@ -65,10 +65,11 @@ struct XYModelParams {
   int downloadFrequency;
   float dt;
   float T;
+  float tDecay;
 
   NLOHMANN_DEFINE_TYPE_INTRUSIVE(XYModelParams, iterations, gridWidth,
                                  gridHeight, threadsPerBlockY, threadsPerBlockY,
-                                 dt, T, downloadFrequency)
+                                 dt, T, tDecay, downloadFrequency)
 };
 
 struct Params {

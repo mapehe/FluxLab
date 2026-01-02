@@ -2,6 +2,7 @@
 #include "io.h"
 #include "kernel/langevin/langevin.cuh"
 #include "kernel/random.cuh"
+#include <cmath>
 
 XYModelEngine::XYModelEngine(const Params &p)
     : ComputeEngine(p), d_grid(nullptr) {
@@ -101,10 +102,11 @@ void XYModelEngine::appendFrame(std::vector<cuDoubleComplex> &history) {
 }
 
 void XYModelEngine::solveStep(int t) {
+  const double T = params.xyModel.T * std::exp(-params.xyModel.tDecay * t);
   cudaMemcpy(d_grid_tmp, d_grid, bufferSize, cudaMemcpyDeviceToDevice);
   langevin_complex_update<<<grid, block>>>(
-      d_grid_tmp, d_grid, d_neighbors, d_offsets, d_degrees, d_states,
-      params.xyModel.T, params.xyModel.dt, gridSize,
+      d_grid_tmp, d_grid, d_neighbors, d_offsets, d_degrees, d_states, T,
+      params.xyModel.dt, gridSize,
       {.width = params.xyModel.gridWidth, .height = params.xyModel.gridHeight});
   cudaError_t err = cudaGetLastError();
   if (err != cudaSuccess) {

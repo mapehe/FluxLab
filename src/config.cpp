@@ -100,5 +100,6 @@ Params preprocessParams(const json &j) {
               parse<int>(xyModelJson, "downloadFrequency", is_pos, pos_err),
           .dt = parse<float>(xyModelJson, "dt", is_pos, pos_err),
           .T = parse<float>(xyModelJson, "T", any, ""),
+          .tDecay = parse<float>(xyModelJson, "tDecay", any, ""),
       }};
 }
