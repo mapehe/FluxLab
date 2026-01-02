@@ -17,4 +17,8 @@ __global__ void calculate_energy_kernel(cuDoubleComplex *spins, int *neighbors,
                                         double *energy_out, int num_spins,
                                         tmpGrid grid);
 
+__global__ void compute_vortex_density(cuDoubleComplex *spins,
+                                       int *vortex_counts, int L, int N,
+                                       tmpGrid grid);
+
 #endif
