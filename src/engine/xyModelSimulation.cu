@@ -4,7 +4,7 @@ const double TAX_VORTEX = 50.0;
 const double TAX_MAG = 5.0;
 const double TAX_TIME = 0.1;
 
-double XYModelEngine::getStepLoss() {
+double XYModelEngine::getStepScore() {
   double cost_vortex = TAX_VORTEX * observable.vortexDensity;
   double cost_mag = TAX_MAG * (1.0 - observable.magnetizationMagnitude);
   double step_loss = cost_vortex + cost_mag + TAX_TIME;

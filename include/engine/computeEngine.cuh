@@ -52,7 +52,7 @@ public:
   ObservableComputeEngine(const Params &p) : ComputeEngine<T>(p) {};
   virtual ~ObservableComputeEngine() = default;
   virtual const U getObservable() = 0;
-  virtual double getStepLoss() = 0;
+  virtual double getStepScore() = 0;
   virtual void modelAction(int input) = 0;
 };
 

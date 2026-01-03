@@ -37,7 +37,7 @@ public:
   int getDownloadFrequency() override;
   int getTotalSteps() override;
   const XYModelObservable getObservable() override;
-  double getStepLoss() override;
+  double getStepScore() override;
   void modelAction(int input) override;
 
 private:
