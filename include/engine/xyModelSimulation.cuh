@@ -34,7 +34,7 @@ public:
   int getTotalSteps() override;
   const XYModelObservable getObservable() override;
   double getStepLoss() override;
-  void modelAction(double input) override;
+  void modelAction(int input) override;
 
 private:
   cuDoubleComplex *d_grid_tmp;
