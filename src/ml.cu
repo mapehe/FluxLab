@@ -76,6 +76,10 @@ public:
       return &policy_net;
   }
 
+  torch::optim::Optimizer getOptimizer() {
+      return &optimizer;
+  }
+
   void step(int simulationStep, int batchIndex, torch::Tensor &batch_states,
             torch::Tensor &batch_actions, torch::Tensor &batch_rewards
 
@@ -156,7 +160,9 @@ void trainModel(Params config) {
       model.resetSimulator(config);
       for (int simulationStep = 0; simulationStep < config.xyModel.iterations;
            simulationStep++) {
-        model.step(simulationStep, batchIndex, batch_states, batch_actions,
+        model.step(simulationStep, 
+
+            batchIndex, batch_states, batch_actions,
                    batch_rewards);
       }
     }
