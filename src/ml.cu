@@ -65,7 +65,9 @@ public:
     policy_net->to(device);
     resetSimulator(params);
   }
-  void step(int t) { simulator->solveStep(t); }
+  void step(int t) {
+    simulator->solveStep(t);
+  }
   void setEval() { policy_net->eval(); }
   void resetSimulator(Params params) { simulator = makeSimulator(params); }
 };
