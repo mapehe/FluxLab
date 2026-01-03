@@ -36,8 +36,8 @@
   },
   "xyModel": {
     "iterations": 4096,
-    "gridWidth": 512,
-    "gridHeight": 512,
+    "gridWidth": 128,
+    "gridHeight": 128,
     "threadsPerBlockX": 32,
     "threadsPerBlockY": 32,
     "downloadFrequency": 128,
