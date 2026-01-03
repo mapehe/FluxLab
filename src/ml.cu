@@ -58,9 +58,9 @@ public:
       int state_dim, int action_dim, Params p)
       : policy_net(state_dim, action_dim),
         optimizer(policy_net->parameters(), torch::optim::AdamOptions(1e-3)),
-        device(torch::kCUDA), simulator(std::move(ptr)), params(params) {
+        device(torch::kCUDA), params(params) {
     policy_net->to(device);
-    policy_net = std::make_unique<XYModelEngine>(p);
+    simulator = std::make_unique<XYModelEngine>(p);
   }
   void step(int t) { simulator->solveStep(t); }
   void setEval(){
