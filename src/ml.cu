@@ -62,7 +62,7 @@ public:
   }
   void step(int t) { simulator->solveStep(t); }
   void setEval() { policy_net->eval(); }
-  void resetSimulator () {
+  void resetSimulator() {
     simulator = std::make_unique<ObservableComputeEngine<T, U>>(params);
   }
 };
