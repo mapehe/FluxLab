@@ -60,7 +60,7 @@ public:
         optimizer(policy_net->parameters(), torch::optim::AdamOptions(1e-3)),
         device(torch::kCUDA), simulator(std::move(ptr)), params(params) {
     policy_net->to(device);
-    model = std::make_unique<XYModelEngine>(p);
+    policy_net = std::make_unique<XYModelEngine>(p);
   }
   void step(int t) { simulator->solveStep(t); }
   void setEval(){
