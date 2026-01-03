@@ -66,7 +66,14 @@ public:
     resetSimulator(params);
   }
   void step(int t) {
+    torch::NoGradGuard no_grad;
     auto observables = simulator->getObservable()->toVector();
+    long input_size = static_cast<long>(observables.size());
+        auto input_tensor = torch::from_blob(
+            (void*)observables.data(), 
+            {1, input_size}, 
+            torch::kFloat
+        );
     simulator->solveStep(t);
   }
   void setEval() { policy_net->eval(); }
