@@ -80,6 +80,7 @@ public:
     auto outoput = policy_net->forward(input);
     auto action = output.argmax(1).item<int>() - 1;
 
+    simulator->modelAction(action);
     simulator->solveStep(t);
   }
   void setEval() { policy_net->eval(); }
