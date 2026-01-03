@@ -96,7 +96,7 @@ void trainModel(Params config) {
           state_dim, action_dim, config);
 
   for (int round = 0; round < config.xyModel.trainingRounds; round++) {
-    std::cout << "Starting simulation round " << round << std::endl;
+    std::cout << "Starting simulation round " << round + 1 << std::endl;
     for (int batchIndex = 0; batchIndex < config.xyModel.trainingBatchSize;
          batchIndex++) {
       model.setEval();
