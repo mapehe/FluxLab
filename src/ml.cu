@@ -53,9 +53,9 @@ void updatePolicy(
 template <typename T, typename U> class ReinforcementLearningFramework {
 protected:
   std::unique_ptr<ObservableComputeEngine<T, U>> simulator;
-  QNetwork policy_net;
   torch::optim::Adam optimizer;
   torch::Device device;
+  QNetwork policy_net;
 
   using SimulatorFactory =
       std::function<std::unique_ptr<ObservableComputeEngine<T, U>>(Params)>;
@@ -154,7 +154,7 @@ void trainModel(Params config) {
                    batch_rewards);
       }
     }
-    updatePolicy();
+    updatePolicy(policy_net, batch_states, batch_actions, batch_rewards);
     auto avg_reward = 0;
     std::cout << "Simulation round " << round + 1 << " complete. Average reward " << avg_reward << std::endl;
   }
