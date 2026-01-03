@@ -125,7 +125,7 @@ void trainModel(Params config) {
 
     torch::Tensor batch_states = torch::zeros({batch_size, config.xyModel.iterations, input_size});
     torch::Tensor batch_actions = torch::zeros({batch_size, config.xyModel.iterations, 1}, torch::kLong);
-    torch::Tensor batch_rewards = torch::zeros({batch_size, config.xyModel.iterations, 1}, torch::kLong);
+    torch::Tensor batch_rewards = torch::zeros({batch_size, config.xyModel.iterations, 1}, torch::kDouble);
 
     for (int batchIndex = 0; batchIndex < config.xyModel.trainingBatchSize;
          batchIndex++) {
