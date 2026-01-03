@@ -98,7 +98,7 @@ void trainModel(Params config) {
 
   for (int round = 0; round < config.xyModel.trainingRounds; round++) {
     std::cout<< "Starting simulation round " << round << std::endl;
-    for (int batch = 0; batch < config.xyModel.trainingBatchSize; batch++) {
+    for (int batchIndex = 0; batchIndex < config.xyModel.trainingBatchSize; batchIndex++) {
       model.setEval();
       for (int t = 0; t < config.xyModel.iterations; t++) {
         model.step(t);
