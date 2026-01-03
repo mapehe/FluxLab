@@ -66,6 +66,7 @@ public:
     resetSimulator(params);
   }
   void step(int t) {
+    auto observables = simulator->getObservable()->toVector();
     simulator->solveStep(t);
   }
   void setEval() { policy_net->eval(); }
