@@ -25,7 +25,7 @@ struct QNetworkImpl : torch::nn::Module {
 TORCH_MODULE(QNetwork);
 
 void updatePolicy(
-    QNetworkImpl* model, torch::optim::Optimizer &optimizer,
+    QNetworkImpl *model, torch::optim::Optimizer &optimizer,
     const torch::Tensor &batch_states,  // Shape: [BatchSize, InputSize]
     const torch::Tensor &batch_actions, // Shape: [BatchSize, 1] (Type: kLong)
     const torch::Tensor
@@ -44,8 +44,7 @@ void updatePolicy(
   optimizer.step();
 }
 
-template <typename T, typename U>
-class ReinforcementLearningFramework {
+template <typename T, typename U> class ReinforcementLearningFramework {
 protected:
   const Params params;
   std::unique_ptr<ObservableComputeEngine<T, U>> simulator;
@@ -54,8 +53,7 @@ protected:
   torch::Device device;
 
 public:
-  ReinforcementLearningFramework(
-      int state_dim, int action_dim, Params p)
+  ReinforcementLearningFramework(int state_dim, int action_dim, Params p)
       : policy_net(state_dim, action_dim),
         optimizer(policy_net->parameters(), torch::optim::AdamOptions(1e-3)),
         device(torch::kCUDA), params(params) {
@@ -63,9 +61,7 @@ public:
     simulator = std::make_unique<XYModelEngine>(p);
   }
   void step(int t) { simulator->solveStep(t); }
-  void setEval(){
-    policy_net->eval();
-  }
+  void setEval() { policy_net->eval(); }
 };
 
 void assertGPU() {
@@ -92,13 +88,14 @@ void trainModel(Params config) {
   // Possible actions are {-1, 0, 1}
   const int action_dim = 3;
 
-  auto model = ReinforcementLearningFramework<cuDoubleComplex,
-                                              XYModelObservable>(
-      state_dim, action_dim, config);
+  auto model =
+      ReinforcementLearningFramework<cuDoubleComplex, XYModelObservable>(
+          state_dim, action_dim, config);
 
   for (int round = 0; round < config.xyModel.trainingRounds; round++) {
-    std::cout<< "Starting simulation round " << round << std::endl;
-    for (int batchIndex = 0; batchIndex < config.xyModel.trainingBatchSize; batchIndex++) {
+    std::cout << "Starting simulation round " << round << std::endl;
+    for (int batchIndex = 0; batchIndex < config.xyModel.trainingBatchSize;
+         batchIndex++) {
       model.setEval();
       for (int t = 0; t < config.xyModel.iterations; t++) {
         model.step(t);

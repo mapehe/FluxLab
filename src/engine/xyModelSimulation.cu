@@ -13,8 +13,8 @@ double XYModelEngine::getStepLoss() {
 }
 
 void XYModelEngine::modelAction(int input) {
-  observable.T +=
-      ((double) input) * params.xyModel.thermostatSensitivity * params.xyModel.dt;
+  observable.T += ((double)input) * params.xyModel.thermostatSensitivity *
+                  params.xyModel.dt;
 }
 
 const XYModelObservable XYModelEngine::getObservable() { return observable; }
