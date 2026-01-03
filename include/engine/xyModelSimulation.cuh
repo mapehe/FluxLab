@@ -21,13 +21,8 @@ struct XYModelObservable {
   double vortexDensity;
 
   std::vector<double> toVector() const {
-    return {
-        T,
-        totalEnergy,
-        simulationProgress,
-        magnetizationMagnitude,
-        vortexDensity
-    };
+    return {T, totalEnergy, simulationProgress, magnetizationMagnitude,
+            vortexDensity};
   }
 };
 

@@ -27,9 +27,11 @@ TORCH_MODULE(QNetwork);
 
 void updatePolicy(
     QNetworkImpl *model, torch::optim::Optimizer &optimizer,
-    const torch::Tensor &batch_states,  // Shape: [BatchSize, SimulationSteps, InputSize]
-    const torch::Tensor &batch_actions, // Shape: [BatchSize, SimulationSteps] (Type: kLong)
-    const torch::Tensor &batch_rewards  // Shape: [BatchSize, SimulationSteps]
+    const torch::Tensor
+        &batch_states, // Shape: [BatchSize, SimulationSteps, InputSize]
+    const torch::Tensor
+        &batch_actions, // Shape: [BatchSize, SimulationSteps] (Type: kLong)
+    const torch::Tensor &batch_rewards // Shape: [BatchSize, SimulationSteps]
 ) {
   model->train();
 
@@ -68,21 +70,16 @@ public:
     policy_net->to(device);
     resetSimulator(params);
   }
-  void step(int simulationStep, int batchIndex,
-     torch::Tensor &batch_states, 
-     torch::Tensor &batch_actions,
-     torch::Tensor &batch_rewards 
+  void step(int simulationStep, int batchIndex, torch::Tensor &batch_states,
+            torch::Tensor &batch_actions, torch::Tensor &batch_rewards
 
-      ) {
+  ) {
     torch::NoGradGuard no_grad;
     auto observables = simulator->getObservable()->toVector();
 
     long input_size = static_cast<long>(observables.size());
-    auto input = torch::from_blob(
-            (void*)observables.data(), 
-            {1, input_size}, 
-            torch::kDouble
-        );
+    auto input = torch::from_blob((void *)observables.data(), {1, input_size},
+                                  torch::kDouble);
 
     input = input.to(torch::kFloat).to(device);
 
@@ -122,7 +119,9 @@ void trainModel(Params config) {
   // Possible actions are {-1, 0, 1}
   const int action_dim = 3;
 
-  auto factory = [=](Params config) { return std::make_unique<XYModelEngine>(config); };
+  auto factory = [=](Params config) {
+    return std::make_unique<XYModelEngine>(config);
+  };
 
   auto model =
       ReinforcementLearningFramework<cuDoubleComplex, XYModelObservable>(
@@ -131,19 +130,21 @@ void trainModel(Params config) {
   for (int round = 0; round < config.xyModel.trainingRounds; round++) {
     std::cout << "Starting simulation round " << round + 1 << std::endl;
 
-    torch::Tensor batch_states = torch::zeros({batch_size, config.xyModel.iterations, state_dim});
-    torch::Tensor batch_actions = torch::zeros({batch_size, config.xyModel.iterations});
-    torch::Tensor batch_rewards = torch::zeros({batch_size, config.xyModel.iterations});
+    torch::Tensor batch_states =
+        torch::zeros({batch_size, config.xyModel.iterations, state_dim});
+    torch::Tensor batch_actions =
+        torch::zeros({batch_size, config.xyModel.iterations});
+    torch::Tensor batch_rewards =
+        torch::zeros({batch_size, config.xyModel.iterations});
 
     for (int batchIndex = 0; batchIndex < config.xyModel.trainingBatchSize;
          batchIndex++) {
       model.setEval();
       model.resetSimulator(config);
-      for (int simulationStep = 0; simulationStep < config.xyModel.iterations; simulationStep++) {
-        model.step(simulationStep, batchIndex
-            batch_states, 
-            batch_actions, 
-            batch_rewards);
+      for (int simulationStep = 0; simulationStep < config.xyModel.iterations;
+           simulationStep++) {
+        model.step(simulationStep, batchIndex batch_states, batch_actions,
+                   batch_rewards);
       }
     }
   }
