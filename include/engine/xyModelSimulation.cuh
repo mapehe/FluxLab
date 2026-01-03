@@ -19,11 +19,15 @@ struct XYModelObservable {
   double simulationProgress;
   double magnetizationMagnitude;
   double vortexDensity;
+
+  std::vector<double> toVector() const {
+    return {T, totalEnergy, simulationProgress, magnetizationMagnitude,
+            vortexDensity};
+  }
 };
 
 class XYModelEngine
-    : public ObservableComputeEngine<cuDoubleComplex, XYModelObservable,
-                                     double> {
+    : public ObservableComputeEngine<cuDoubleComplex, XYModelObservable> {
 public:
   explicit XYModelEngine(const Params &p);
   ~XYModelEngine() override;
@@ -33,8 +37,8 @@ public:
   int getDownloadFrequency() override;
   int getTotalSteps() override;
   const XYModelObservable getObservable() override;
-  double getStepLoss() override;
-  void modelAction(double input) override;
+  double getStepScore() override;
+  void modelAction(int input) override;
 
 private:
   cuDoubleComplex *d_grid_tmp;

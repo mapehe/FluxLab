@@ -1,20 +1,23 @@
 #include "engine/xyModelSimulation.cuh"
+#include <algorithm>
 
 const double TAX_VORTEX = 50.0;
 const double TAX_MAG = 5.0;
 const double TAX_TIME = 0.1;
 
-double XYModelEngine::getStepLoss() {
+double XYModelEngine::getStepScore() {
   double cost_vortex = TAX_VORTEX * observable.vortexDensity;
   double cost_mag = TAX_MAG * (1.0 - observable.magnetizationMagnitude);
-  double step_loss = cost_vortex + cost_mag + TAX_TIME;
+  double step_loss = cost_mag;
 
-  return step_loss;
+  return -step_loss;
 }
 
-void XYModelEngine::modelAction(double input) {
-  observable.T +=
-      input * params.xyModel.thermostatSensitivity * params.xyModel.dt;
+void XYModelEngine::modelAction(int input) {
+  // input is 0, 1 or 2 so by subtracting 1 we get the desired effect
+  observable.T += ((double)(input - 1)) * params.xyModel.thermostatSensitivity *
+                  params.xyModel.dt;
+  observable.T = std::min(std::max(0.0, observable.T), 2.0);
 }
 
 const XYModelObservable XYModelEngine::getObservable() { return observable; }
@@ -129,16 +132,15 @@ XYModelEngine::XYModelEngine(const Params &p)
 }
 
 XYModelEngine::~XYModelEngine() {
-  if (d_grid) {
-    cudaFree(d_grid);
-    cudaFree(d_grid_tmp);
-    cudaFree(d_states);
-    cudaFree(d_neighbors);
-    cudaFree(d_offsets);
-    cudaFree(d_degrees);
-    cudaFree(d_energy_out);
-    d_grid = nullptr;
-  }
+  cudaFree(d_grid);
+  cudaFree(d_grid_tmp);
+  cudaFree(d_states);
+  cudaFree(d_neighbors);
+  cudaFree(d_offsets);
+  cudaFree(d_degrees);
+  cudaFree(d_energy_out);
+  cudaFree(d_vortex_counts);
+  d_grid = nullptr;
 }
 
 void XYModelEngine::appendFrame(std::vector<cuDoubleComplex> &history) {
