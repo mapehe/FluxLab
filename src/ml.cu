@@ -69,9 +69,9 @@ public:
     resetSimulator(params);
   }
   void step(int simulationStep, int batchIndex,
-    const torch::Tensor &batch_states, 
-    const torch::Tensor &batch_actions,
-    const torch::Tensor &batch_rewards 
+     torch::Tensor &batch_states, 
+     torch::Tensor &batch_actions,
+     torch::Tensor &batch_rewards 
 
       ) {
     torch::NoGradGuard no_grad;
