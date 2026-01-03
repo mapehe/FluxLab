@@ -77,7 +77,6 @@ public:
         );
 
     input = input.to(torch::kFloat).to(device);
-
     auto policy_net->forward(input);
 
     simulator->solveStep(t);
