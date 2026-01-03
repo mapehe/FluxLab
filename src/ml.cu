@@ -124,8 +124,8 @@ void trainModel(Params config) {
     std::cout << "Starting simulation round " << round + 1 << std::endl;
 
     torch::Tensor batch_states = torch::zeros({batch_size, config.xyModel.iterations, input_size});
-    torch::Tensor batch_actions = torch::zeros({batch_size, config.xyModel.iterations, 1}, torch::kLong);
-    torch::Tensor batch_rewards = torch::zeros({batch_size, config.xyModel.iterations, 1}, torch::kDouble);
+    torch::Tensor batch_actions = torch::zeros({batch_size, config.xyModel.iterations, 1});
+    torch::Tensor batch_rewards = torch::zeros({batch_size, config.xyModel.iterations, 1});
 
     for (int batchIndex = 0; batchIndex < config.xyModel.trainingBatchSize;
          batchIndex++) {
