@@ -129,16 +129,15 @@ XYModelEngine::XYModelEngine(const Params &p)
 }
 
 XYModelEngine::~XYModelEngine() {
-  if (d_grid) {
-    cudaFree(d_grid);
-    cudaFree(d_grid_tmp);
-    cudaFree(d_states);
-    cudaFree(d_neighbors);
-    cudaFree(d_offsets);
-    cudaFree(d_degrees);
-    cudaFree(d_energy_out);
-    d_grid = nullptr;
-  }
+  cudaFree(d_grid);
+  cudaFree(d_grid_tmp);
+  cudaFree(d_states);
+  cudaFree(d_neighbors);
+  cudaFree(d_offsets);
+  cudaFree(d_degrees);
+  cudaFree(d_energy_out);
+  cudaFree(d_vortex_counts);
+  d_grid = nullptr;
 }
 
 void XYModelEngine::appendFrame(std::vector<cuDoubleComplex> &history) {
