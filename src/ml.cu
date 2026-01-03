@@ -85,6 +85,9 @@ public:
         );
 
     input = input.to(torch::kFloat).to(device);
+
+    batch_states[batchIndex][simulationStep] = input.squeeze(0);
+
     auto outoput = policy_net->forward(input);
     auto action = output.argmax(1).item<int>() - 1;
 
