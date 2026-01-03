@@ -135,7 +135,6 @@ void trainModel(Params config) {
           state_dim, action_dim, factory, config);
 
   for (int round = 0; round < config.xyModel.trainingRounds; round++) {
-    std::cout << "Starting simulation round " << round + 1 << std::endl;
 
     torch::Tensor batch_states =
         torch::zeros({config.xyModel.trainingBatchSize,
@@ -155,5 +154,8 @@ void trainModel(Params config) {
                    batch_rewards);
       }
     }
+    updatePolicy();
+    auto avg_reward = 0;
+    std::cout << "Simulation round " << round + 1 << " complete. Average reward " << avg_reward << std::endl;
   }
 }
