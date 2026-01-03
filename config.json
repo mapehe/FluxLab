@@ -35,7 +35,7 @@
     "g": 10e1
   },
   "xyModel": {
-    "iterations": 4096,
+    "iterations": 1024,
     "gridWidth": 128,
     "gridHeight": 128,
     "threadsPerBlockX": 32,
@@ -46,6 +46,6 @@
     "tDecay": 5e-5,
     "thermostatSensitivity": 1.0,
     "trainingRounds": 5,
-    "trainingBatchSize": 8
+    "trainingBatchSize": 4
   }
 }
