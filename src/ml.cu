@@ -70,6 +70,11 @@ public:
     policy_net->to(device);
     resetSimulator(params);
   }
+
+  QNetwork* getPolicyNet() {
+      return &policy_net;
+  }
+
   void step(int simulationStep, int batchIndex, torch::Tensor &batch_states,
             torch::Tensor &batch_actions, torch::Tensor &batch_rewards
 
@@ -154,7 +159,7 @@ void trainModel(Params config) {
                    batch_rewards);
       }
     }
-    updatePolicy(policy_net, batch_states, batch_actions, batch_rewards);
+    updatePolicy(model.getPolicyNet(), batch_states, batch_actions, batch_rewards);
     auto avg_reward = 0;
     std::cout << "Simulation round " << round + 1 << " complete. Average reward " << avg_reward << std::endl;
   }
