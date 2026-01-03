@@ -47,14 +47,13 @@ void updatePolicy(
 
 template <typename T, typename U> class ReinforcementLearningFramework {
 protected:
-  const Params params;
   std::unique_ptr<ObservableComputeEngine<T, U>> simulator;
   QNetwork policy_net;
   torch::optim::Adam optimizer;
   torch::Device device;
 
   using SimulatorFactory =
-      std::function<std::unique_ptr<ObservableComputeEngine<T, U>>()>;
+      std::function<std::unique_ptr<ObservableComputeEngine<T, U>>(params)>;
   SimulatorFactory makeSimulator;
 
 public:
@@ -68,7 +67,7 @@ public:
   }
   void step(int t) { simulator->solveStep(t); }
   void setEval() { policy_net->eval(); }
-  void resetSimulator() { simulator = makeSimulator(); }
+  void resetSimulator(Params params) { simulator = makeSimulator(params); }
 };
 
 void assertGPU() {
@@ -95,7 +94,7 @@ void trainModel(Params config) {
   // Possible actions are {-1, 0, 1}
   const int action_dim = 3;
 
-  auto factory = [=]() { return std::make_unique<XYModelEngine>(config); };
+  auto factory = [=](Params config) { return std::make_unique<XYModelEngine>(config); };
 
   auto model =
       ReinforcementLearningFramework<cuDoubleComplex, XYModelObservable>(
@@ -106,7 +105,7 @@ void trainModel(Params config) {
     for (int batchIndex = 0; batchIndex < config.xyModel.trainingBatchSize;
          batchIndex++) {
       model.setEval();
-      model.resetSimulator();
+      model.resetSimulator(config);
       for (int t = 0; t < config.xyModel.iterations; t++) {
         model.step(t);
       }
