@@ -155,8 +155,8 @@ void trainModel(Params config) {
                    batch_rewards);
       }
     }
-    updatePolicy(model.policy_net, model.optimizer, batch_states,
-                 batch_actions, batch_rewards);
+    updatePolicy(model.policy_net, model.optimizer, batch_states, batch_actions,
+                 batch_rewards);
     auto avg_reward = batch_rewards.mean().item<float>();
     std::cout << "Simulation round " << round + 1
               << " complete. Average reward " << avg_reward << std::endl;
