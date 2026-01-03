@@ -26,7 +26,8 @@ struct QNetworkImpl : torch::nn::Module {
 TORCH_MODULE(QNetwork);
 
 void updatePolicy(
-    QNetworkImpl *model, torch::optim::Optimizer &optimizer,
+    QNetwork &model,
+    torch::optim::Optimizer &optimizer,
     const torch::Tensor
         &batch_states, // Shape: [BatchSize, SimulationSteps, InputSize]
     const torch::Tensor
@@ -159,7 +160,7 @@ void trainModel(Params config) {
                    batch_rewards);
       }
     }
-    updatePolicy(model.getPolicyNet(), batch_states, batch_actions, batch_rewards);
+    updatePolicy(*model.getPolicyNet(), batch_states, batch_actions, batch_rewards);
     auto avg_reward = batch_rewards.mean().item<float>();
     std::cout << "Simulation round " << round + 1 << " complete. Average reward " << avg_reward << std::endl;
   }
