@@ -55,12 +55,12 @@ protected:
 
 public:
   ReinforcementLearningFramework(
-      int state_dim, int action_dim,
-      std::unique_ptr<ObservableComputeEngine<T, U>> ptr)
+      int state_dim, int action_dim, Params p)
       : policy_net(state_dim, action_dim),
         optimizer(policy_net->parameters(), torch::optim::AdamOptions(1e-3)),
-        device(torch::kCUDA), simulator(std::move(ptr)) {
+        device(torch::kCUDA), simulator(std::move(ptr)), params(params) {
     policy_net->to(device);
+    model = std::make_unique<XYModelEngine>(config);
   }
   void step(int t) { simulator->solveStep(t); }
   void setEval(){
