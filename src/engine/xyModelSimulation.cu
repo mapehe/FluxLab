@@ -9,7 +9,7 @@ double XYModelEngine::getStepLoss() {
   double cost_mag = TAX_MAG * (1.0 - observable.magnetizationMagnitude);
   double step_loss = cost_vortex + cost_mag + TAX_TIME;
 
-  return step_loss;
+  return -step_loss;
 }
 
 void XYModelEngine::modelAction(int input) {
