@@ -93,7 +93,7 @@ void trainModel(Params config) {
 
   auto ptr = std::make_unique<XYModelEngine>(config);
   auto model = ReinforcementLearningFramework<cuDoubleComplex,
-                                              XYModelObservable, double>(
+                                              XYModelObservable>(
       state_dim, action_dim, std::move(ptr));
 
   for (int round = 0; round < config.xyModel.trainingRounds; round++) {
