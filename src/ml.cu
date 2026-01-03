@@ -78,7 +78,7 @@ public:
 
     input = input.to(torch::kFloat).to(device);
     auto outoput = policy_net->forward(input);
-    auto action = output.argmax(1).item<int>();
+    auto action = output.argmax(1).item<int>() - 1;
 
     simulator->solveStep(t);
   }
