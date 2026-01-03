@@ -26,8 +26,7 @@ struct QNetworkImpl : torch::nn::Module {
 TORCH_MODULE(QNetwork);
 
 void updatePolicy(
-    QNetwork &model,
-    torch::optim::Optimizer &optimizer,
+    QNetwork &model, torch::optim::Optimizer &optimizer,
     const torch::Tensor
         &batch_states, // Shape: [BatchSize, SimulationSteps, InputSize]
     const torch::Tensor
@@ -72,13 +71,9 @@ public:
     resetSimulator(params);
   }
 
-  QNetwork* getPolicyNet() {
-      return &policy_net;
-  }
+  QNetwork *getPolicyNet() { return &policy_net; }
 
-  torch::optim::Optimizer getOptimizer() {
-      return &optimizer;
-  }
+  torch::optim::Optimizer getOptimizer() { return &optimizer; }
 
   void step(int simulationStep, int batchIndex, torch::Tensor &batch_states,
             torch::Tensor &batch_actions, torch::Tensor &batch_rewards
@@ -160,15 +155,14 @@ void trainModel(Params config) {
       model.resetSimulator(config);
       for (int simulationStep = 0; simulationStep < config.xyModel.iterations;
            simulationStep++) {
-        model.step(simulationStep, 
-            batchIndex, batch_states, batch_actions,
+        model.step(simulationStep, batchIndex, batch_states, batch_actions,
                    batch_rewards);
       }
     }
-    updatePolicy(*model.getPolicyNet(),
-        *model.getOptimizer()
-        batch_states, batch_actions, batch_rewards);
+    updatePolicy(*model.getPolicyNet(), *model.getOptimizer() batch_states,
+                 batch_actions, batch_rewards);
     auto avg_reward = batch_rewards.mean().item<float>();
-    std::cout << "Simulation round " << round + 1 << " complete. Average reward " << avg_reward << std::endl;
+    std::cout << "Simulation round " << round + 1
+              << " complete. Average reward " << avg_reward << std::endl;
   }
 }
