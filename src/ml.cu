@@ -73,7 +73,7 @@ public:
 
   QNetwork *getPolicyNet() { return &policy_net; }
 
-  torch::optim::Optimizer getOptimizer() { return &optimizer; }
+  torch::optim::Adam getOptimizer() { return &optimizer; }
 
   void step(int simulationStep, int batchIndex, torch::Tensor &batch_states,
             torch::Tensor &batch_actions, torch::Tensor &batch_rewards
