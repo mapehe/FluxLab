@@ -53,15 +53,15 @@ void updatePolicy(
 template <typename T, typename U> class ReinforcementLearningFramework {
 protected:
   std::unique_ptr<ObservableComputeEngine<T, U>> simulator;
-  torch::optim::Adam optimizer;
   torch::Device device;
-  QNetwork policy_net;
 
   using SimulatorFactory =
       std::function<std::unique_ptr<ObservableComputeEngine<T, U>>(Params)>;
   SimulatorFactory makeSimulator;
 
 public:
+  torch::optim::Adam optimizer;
+  QNetwork policy_net;
   ReinforcementLearningFramework(int state_dim, int action_dim,
                                  SimulatorFactory factory, Params params)
       : policy_net(state_dim, action_dim),
@@ -70,10 +70,6 @@ public:
     policy_net->to(device);
     resetSimulator(params);
   }
-
-  QNetwork *getPolicyNet() { return &policy_net; }
-
-  torch::optim::Adam getOptimizer() { return &optimizer; }
 
   void step(int simulationStep, int batchIndex, torch::Tensor &batch_states,
             torch::Tensor &batch_actions, torch::Tensor &batch_rewards
@@ -159,7 +155,7 @@ void trainModel(Params config) {
                    batch_rewards);
       }
     }
-    updatePolicy(*model.getPolicyNet(), *model.getOptimizer(), batch_states,
+    updatePolicy(model.policy_net, model.optimizer, batch_states,
                  batch_actions, batch_rewards);
     auto avg_reward = batch_rewards.mean().item<float>();
     std::cout << "Simulation round " << round + 1
