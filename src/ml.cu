@@ -52,6 +52,7 @@ protected:
   QNetwork policy_net;
   torch::optim::Adam optimizer;
   torch::Device device;
+
   using SimulatorFactory = std::function<std::unique_ptr<ObservableComputeEngine<T, U>>()>;
   SimulatorFactory makeSimulator;
 
