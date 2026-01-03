@@ -70,14 +70,15 @@ public:
     auto observables = simulator->getObservable()->toVector();
 
     long input_size = static_cast<long>(observables.size());
-        auto input_tensor = torch::from_blob(
+    auto input = torch::from_blob(
             (void*)observables.data(), 
             {1, input_size}, 
             torch::kDouble
         );
 
-    input_tensor = input_tensor.to(device);
-    auto output = policy_net->forward(input_tensor);
+    input = input.to(torch::kFloat).to(device);
+
+    auto policy_net->forward(input);
 
     simulator->solveStep(t);
   }
