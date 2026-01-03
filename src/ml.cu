@@ -68,7 +68,12 @@ public:
     policy_net->to(device);
     resetSimulator(params);
   }
-  void step(int simulationStep, int batchIndex) {
+  void step(int simulationStep, int batchIndex,
+    const torch::Tensor &batch_states, 
+    const torch::Tensor &batch_actions,
+    const torch::Tensor &batch_rewards 
+
+      ) {
     torch::NoGradGuard no_grad;
     auto observables = simulator->getObservable()->toVector();
 
