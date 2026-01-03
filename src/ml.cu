@@ -17,13 +17,32 @@ struct QNetworkImpl : torch::nn::Module {
     x = torch::relu(fc1->forward(x));
     x = torch::relu(fc2->forward(x));
     x = out->forward(x);
-    x = torch::tanh(x);
 
     return x;
   }
 };
 
 TORCH_MODULE(QNetwork);
+
+void updatePolicy(
+    QNetworkImpl* model, torch::optim::Optimizer &optimizer,
+    const torch::Tensor &batch_states,  // Shape: [BatchSize, InputSize]
+    const torch::Tensor &batch_actions, // Shape: [BatchSize, 1] (Type: kLong)
+    const torch::Tensor
+        &batch_rewards // Shape: [BatchSize, 1] (Calculated Returns G_t)
+) {
+  model->train();
+
+  auto logits = model->forward(batch_states);
+  auto log_probs_all = torch::log_softmax(logits, /*dim=*/1);
+  auto selected_log_probs = log_probs_all.gather(1, batch_actions);
+
+  auto loss = -(selected_log_probs * batch_rewards).mean();
+
+  optimizer.zero_grad();
+  loss.backward();
+  optimizer.step();
+}
 
 template <typename T, typename U, typename I>
 class ReinforcementLearningFramework {
@@ -41,6 +60,10 @@ public:
         optimizer(policy_net->parameters(), torch::optim::AdamOptions(1e-3)),
         device(torch::kCUDA), simulator(std::move(ptr)) {
     policy_net->to(device);
+  }
+  void step(int t) { simulator->solveStep(t); }
+  void setEval(){
+    policy_net->eval();
   }
 };
 
@@ -64,11 +87,22 @@ void trainModel(Params config) {
   assertGPU();
   assertXYModelMode(config);
 
-  constexpr auto state_dim = 5;
-  const int action_dim = 1;
+  constexpr int state_dim = 5;
+  // Possible actions are {-1, 0, 1}
+  const int action_dim = 3;
 
   auto ptr = std::make_unique<XYModelEngine>(config);
   auto model = ReinforcementLearningFramework<cuDoubleComplex,
                                               XYModelObservable, double>(
       state_dim, action_dim, std::move(ptr));
+
+  for (int round = 0; round < config.xyModel.trainingRounds; round++) {
+    std::cout<< "Starting simulation round " << round << std::endl;
+    for (int batch = 0; round < config.xyModel.trainingBatchSize; batch++) {
+      model.setEval();
+      for (int t = 0; t < config.xyModel.iterations; t++) {
+        model.step(t);
+      }
+    }
+  }
 }

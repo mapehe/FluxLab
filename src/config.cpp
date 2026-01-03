@@ -104,5 +104,8 @@ Params preprocessParams(const json &j) {
           .tDecay = parse<float>(xyModelJson, "tDecay", any, ""),
           .thermostatSensitivity =
               parse<float>(xyModelJson, "thermostatSensitivity", any, ""),
+          .trainingRounds = parse<int>(xyModelJson, "trainingRounds", any, ""),
+          .trainingBatchSize =
+              parse<int>(xyModelJson, "trainingBatchSize", any, ""),
       }};
 }
