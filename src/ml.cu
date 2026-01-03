@@ -100,6 +100,7 @@ void trainModel(Params config) {
     for (int batchIndex = 0; batchIndex < config.xyModel.trainingBatchSize;
          batchIndex++) {
       model.setEval();
+      model.resetSimulator();
       for (int t = 0; t < config.xyModel.iterations; t++) {
         model.step(t);
       }
