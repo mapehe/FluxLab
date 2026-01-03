@@ -93,7 +93,7 @@ public:
     auto scoreBefore = simulator->getStepScore();
     simulator->solveStep(simulationStep);
     auto scoreAfter = simulator->getStepScore();
-    auto reward = scoreAfter - scoreBefore;
+    auto reward = scoreAfter-scoreBefore;
   }
   void setEval() { policy_net->eval(); }
   void resetSimulator(Params params) { simulator = makeSimulator(params); }
