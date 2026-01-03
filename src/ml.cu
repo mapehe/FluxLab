@@ -53,11 +53,13 @@ protected:
   torch::optim::Adam optimizer;
   torch::Device device;
 
-  using SimulatorFactory = std::function<std::unique_ptr<ObservableComputeEngine<T, U>>()>;
+  using SimulatorFactory =
+      std::function<std::unique_ptr<ObservableComputeEngine<T, U>>()>;
   SimulatorFactory makeSimulator;
 
 public:
-  ReinforcementLearningFramework(int state_dim, int action_dim, SimulatorFactory factory)
+  ReinforcementLearningFramework(int state_dim, int action_dim,
+                                 SimulatorFactory factory)
       : policy_net(state_dim, action_dim),
         optimizer(policy_net->parameters(), torch::optim::AdamOptions(1e-3)),
         device(torch::kCUDA), makeSimulator(factory) {
@@ -66,9 +68,7 @@ public:
   }
   void step(int t) { simulator->solveStep(t); }
   void setEval() { policy_net->eval(); }
-  void resetSimulator() {
-    simulator = makeSimulator();
-  }
+  void resetSimulator() { simulator = makeSimulator(); }
 };
 
 void assertGPU() {
@@ -95,9 +95,7 @@ void trainModel(Params config) {
   // Possible actions are {-1, 0, 1}
   const int action_dim = 3;
 
-  auto factory = [=]() { 
-    return std::make_unique<XYModelEngine>(config); 
-  };
+  auto factory = [=]() { return std::make_unique<XYModelEngine>(config); };
 
   auto model =
       ReinforcementLearningFramework<cuDoubleComplex, XYModelObservable>(
