@@ -65,7 +65,7 @@ public:
     policy_net->to(device);
     resetSimulator(params);
   }
-  void step(int t) {
+  void step(int simulationStep, int batchIndex) {
     torch::NoGradGuard no_grad;
     auto observables = simulator->getObservable()->toVector();
 
@@ -81,7 +81,7 @@ public:
     auto action = output.argmax(1).item<int>() - 1;
 
     simulator->modelAction(action);
-    simulator->solveStep(t);
+    simulator->solveStep(simulationStep);
   }
   void setEval() { policy_net->eval(); }
   void resetSimulator(Params params) { simulator = makeSimulator(params); }
@@ -127,8 +127,8 @@ void trainModel(Params config) {
          batchIndex++) {
       model.setEval();
       model.resetSimulator(config);
-      for (int t = 0; t < config.xyModel.iterations; t++) {
-        model.step(t);
+      for (int simulationStep = 0; simulationStep < config.xyModel.iterations; simulationStep++) {
+        model.step(simulationStep, batchIndex);
       }
     }
   }
