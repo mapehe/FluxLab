@@ -46,6 +46,6 @@
     "tDecay": 5e-5,
     "thermostatSensitivity": 1.0,
     "trainingRounds": 10,
-    "trainingBatchSize": 16
+    "trainingBatchSize": 8
   }
 }
