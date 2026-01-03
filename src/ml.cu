@@ -119,6 +119,10 @@ void trainModel(Params config) {
 
   for (int round = 0; round < config.xyModel.trainingRounds; round++) {
     std::cout << "Starting simulation round " << round + 1 << std::endl;
+
+    torch::Tensor batch_states = torch::zeros({batch_size, input_size});
+    torch::Tensor batch_actions = torch::zeros({batch_size, 1}, torch::kLong);
+
     for (int batchIndex = 0; batchIndex < config.xyModel.trainingBatchSize;
          batchIndex++) {
       model.setEval();
