@@ -1,5 +1,24 @@
 #include "engine/xyModelSimulation.cuh"
 
+const double TAX_VORTEX = 50.0;
+const double TAX_MAG = 5.0;
+const double TAX_TIME = 0.1;
+
+double XYModelEngine::getStepLoss() {
+  double cost_vortex = TAX_VORTEX * observable.vortexDensity;
+  double cost_mag = TAX_MAG * (1.0 - observable.magnetizationMagnitude);
+  double step_loss = cost_vortex + cost_mag + TAX_TIME;
+
+  return step_loss;
+}
+
+void XYModelEngine::modelAction(double input) {
+  observable.T +=
+      input * params.xyModel.thermostatSensitivity * params.xyModel.dt;
+}
+
+const XYModelObservable XYModelEngine::getObservable() { return observable; }
+
 void XYModelEngine::computeObservables(tmpGrid gridParams) {
   calculate_energy_kernel<<<grid, block>>>(d_grid, d_neighbors, d_offsets,
                                            d_degrees, d_energy_out, gridSize,
@@ -8,13 +27,15 @@ void XYModelEngine::computeObservables(tmpGrid gridParams) {
 
   thrust::device_ptr<double> t_energy_ptr(d_energy_out);
 
-  observable.totalEnergy = thrust::reduce(t_energy_ptr, t_energy_ptr + gridSize, 0.0,
-                               thrust::plus<double>());
+  observable.totalEnergy = thrust::reduce(t_energy_ptr, t_energy_ptr + gridSize,
+                                          0.0, thrust::plus<double>()) /
+                           gridSize;
 
   thrust::device_ptr<cuDoubleComplex> dev_ptr(d_grid);
-  observable.totalMagnetization =
+  cuDoubleComplex totalMagnetization =
       thrust::reduce(dev_ptr, dev_ptr + gridSize,
                      make_cuDoubleComplex(0.0, 0.0), ComplexSum());
+  observable.magnetizationMagnitude = cuCabs(totalMagnetization) / gridSize;
 
   compute_vortex_density<<<grid, block>>>(
       d_grid, d_vortex_counts, params.xyModel.gridWidth, gridSize, gridParams);
@@ -105,7 +126,6 @@ XYModelEngine::XYModelEngine(const Params &p)
   computeObservables(
       {.width = params.xyModel.gridWidth, .height = params.xyModel.gridHeight});
   observable.simulationProgress = 0.0;
-
 }
 
 XYModelEngine::~XYModelEngine() {
@@ -132,14 +152,15 @@ void XYModelEngine::appendFrame(std::vector<cuDoubleComplex> &history) {
 }
 
 void XYModelEngine::solveStep(int t) {
-  observable.simulationProgress = ((double)t) / ((double)params.xyModel.iterations);
+  observable.simulationProgress =
+      ((double)t) / ((double)params.xyModel.iterations);
   if (!params.machineLearningMode) {
     observable.T = params.xyModel.T * std::exp(-params.xyModel.tDecay * t);
   }
   cudaMemcpy(d_grid_tmp, d_grid, bufferSize, cudaMemcpyDeviceToDevice);
   langevin_complex_update<<<grid, block>>>(
-      d_grid_tmp, d_grid, d_neighbors, d_offsets, d_degrees, d_states, observable.T,
-      params.xyModel.dt, gridSize,
+      d_grid_tmp, d_grid, d_neighbors, d_offsets, d_degrees, d_states,
+      observable.T, params.xyModel.dt, gridSize,
       {.width = params.xyModel.gridWidth, .height = params.xyModel.gridHeight});
   computeObservables(
       {.width = params.xyModel.gridWidth, .height = params.xyModel.gridHeight});

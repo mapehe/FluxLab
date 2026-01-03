@@ -43,14 +43,17 @@ public:
   }
 };
 
-template <typename T, typename U>
+template <typename T, typename U, typename I>
 class ObservableComputeEngine : public ComputeEngine<T> {
 protected:
-    U observable;
+  U observable;
 
 public:
-    ObservableComputeEngine(const Params &p) : ComputeEngine<T>(p) {};
-    virtual ~ObservableComputeEngine() = default;
+  ObservableComputeEngine(const Params &p) : ComputeEngine<T>(p) {};
+  virtual ~ObservableComputeEngine() = default;
+  virtual const U getObservable() = 0;
+  virtual double getStepLoss() = 0;
+  virtual void modelAction(I input) = 0;
 };
 
 #endif

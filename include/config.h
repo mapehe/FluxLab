@@ -66,10 +66,12 @@ struct XYModelParams {
   float dt;
   float T;
   float tDecay;
+  float thermostatSensitivity;
 
   NLOHMANN_DEFINE_TYPE_INTRUSIVE(XYModelParams, iterations, gridWidth,
                                  gridHeight, threadsPerBlockY, threadsPerBlockY,
-                                 dt, T, tDecay, downloadFrequency)
+                                 dt, T, tDecay, thermostatSensitivity,
+                                 downloadFrequency)
 };
 
 struct Params {

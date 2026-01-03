@@ -102,5 +102,7 @@ Params preprocessParams(const json &j) {
           .dt = parse<float>(xyModelJson, "dt", is_pos, pos_err),
           .T = parse<float>(xyModelJson, "T", any, ""),
           .tDecay = parse<float>(xyModelJson, "tDecay", any, ""),
+          .thermostatSensitivity =
+              parse<float>(xyModelJson, "thermostatSensitivity", any, ""),
       }};
 }

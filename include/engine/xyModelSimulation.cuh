@@ -13,16 +13,17 @@
 #include <thrust/functional.h>
 #include <thrust/transform_reduce.h>
 
-// TODO: Add T and others here
 struct XYModelObservable {
-    double T;
-    double totalEnergy;
-    double simulationProgress;
-    cuDoubleComplex totalMagnetization;
-    double vortexDensity;
+  double T;
+  double totalEnergy;
+  double simulationProgress;
+  double magnetizationMagnitude;
+  double vortexDensity;
 };
 
-class XYModelEngine : public ObservableComputeEngine<cuDoubleComplex, XYModelObservable> {
+class XYModelEngine
+    : public ObservableComputeEngine<cuDoubleComplex, XYModelObservable,
+                                     double> {
 public:
   explicit XYModelEngine(const Params &p);
   ~XYModelEngine() override;
@@ -31,9 +32,9 @@ public:
   void saveResults(const std::string &filename) override;
   int getDownloadFrequency() override;
   int getTotalSteps() override;
-
-  // Need to access this from the ML model
-  cuDoubleComplex *d_grid;
+  const XYModelObservable getObservable() override;
+  double getStepLoss() override;
+  void modelAction(double input) override;
 
 private:
   cuDoubleComplex *d_grid_tmp;
@@ -48,6 +49,7 @@ private:
 
   void computeObservables(tmpGrid gridParams);
   int *d_vortex_counts;
+  cuDoubleComplex *d_grid;
 };
 
 #endif
