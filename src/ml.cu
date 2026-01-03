@@ -53,7 +53,7 @@ protected:
   torch::Device device;
 
   using SimulatorFactory =
-      std::function<std::unique_ptr<ObservableComputeEngine<T, U>>(params)>;
+      std::function<std::unique_ptr<ObservableComputeEngine<T, U>>(Params)>;
   SimulatorFactory makeSimulator;
 
 public:
