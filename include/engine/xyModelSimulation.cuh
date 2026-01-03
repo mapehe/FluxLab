@@ -19,6 +19,16 @@ struct XYModelObservable {
   double simulationProgress;
   double magnetizationMagnitude;
   double vortexDensity;
+
+  std::vector<double> toVector() const {
+    return {
+        T,
+        totalEnergy,
+        simulationProgress,
+        magnetizationMagnitude,
+        vortexDensity
+    };
+  }
 };
 
 class XYModelEngine
