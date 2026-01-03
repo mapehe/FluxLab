@@ -3,6 +3,7 @@
 #include "ml.cuh"
 #include <cuComplex.h>
 #include <cuda_runtime.h>
+#include <functional>
 
 struct QNetworkImpl : torch::nn::Module {
   torch::nn::Linear fc1{nullptr}, fc2{nullptr}, out{nullptr};
@@ -51,19 +52,21 @@ protected:
   QNetwork policy_net;
   torch::optim::Adam optimizer;
   torch::Device device;
+  using SimulatorFactory = std::function<std::unique_ptr<ObservableComputeEngine<T, U>>()>;
+  SimulatorFactory makeSimulator;
 
 public:
-  ReinforcementLearningFramework(int state_dim, int action_dim, Params p)
+  ReinforcementLearningFramework(int state_dim, int action_dim, SimulatorFactory factory)
       : policy_net(state_dim, action_dim),
         optimizer(policy_net->parameters(), torch::optim::AdamOptions(1e-3)),
-        device(torch::kCUDA), params(params) {
+        device(torch::kCUDA), makeSimulator(factory) {
     policy_net->to(device);
     resetSimulator();
   }
   void step(int t) { simulator->solveStep(t); }
   void setEval() { policy_net->eval(); }
   void resetSimulator() {
-    simulator = std::make_unique<ObservableComputeEngine<T, U>>(params);
+    simulator = makeSimulator();
   }
 };
 
