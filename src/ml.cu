@@ -44,10 +44,10 @@ void updatePolicy(
   optimizer.step();
 }
 
-template <typename T, typename U, typename I>
+template <typename T, typename U>
 class ReinforcementLearningFramework {
 protected:
-  std::unique_ptr<ObservableComputeEngine<T, U, I>> simulator;
+  std::unique_ptr<ObservableComputeEngine<T, U>> simulator;
   QNetwork policy_net;
   torch::optim::Adam optimizer;
   torch::Device device;

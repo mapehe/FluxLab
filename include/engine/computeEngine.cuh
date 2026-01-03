@@ -43,7 +43,7 @@ public:
   }
 };
 
-template <typename T, typename U, typename I>
+template <typename T, typename U>
 class ObservableComputeEngine : public ComputeEngine<T> {
 protected:
   U observable;
@@ -53,7 +53,7 @@ public:
   virtual ~ObservableComputeEngine() = default;
   virtual const U getObservable() = 0;
   virtual double getStepLoss() = 0;
-  virtual void modelAction(I input) = 0;
+  virtual void modelAction(int input) = 0;
 };
 
 #endif
