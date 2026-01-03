@@ -55,7 +55,7 @@ protected:
 public:
   ReinforcementLearningFramework(
       int state_dim, int action_dim,
-      std::unique_ptr<ObservableComputeEngine<T, U, I>> ptr)
+      std::unique_ptr<ObservableComputeEngine<T, U>> ptr)
       : policy_net(state_dim, action_dim),
         optimizer(policy_net->parameters(), torch::optim::AdamOptions(1e-3)),
         device(torch::kCUDA), simulator(std::move(ptr)) {
