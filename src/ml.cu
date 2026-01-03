@@ -151,7 +151,7 @@ void trainModel(Params config) {
       model.resetSimulator(config);
       for (int simulationStep = 0; simulationStep < config.xyModel.iterations;
            simulationStep++) {
-        model.step(simulationStep, batchIndex batch_states, batch_actions,
+        model.step(simulationStep, batchIndex, batch_states, batch_actions,
                    batch_rewards);
       }
     }
