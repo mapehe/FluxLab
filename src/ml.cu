@@ -72,8 +72,11 @@ public:
         auto input_tensor = torch::from_blob(
             (void*)observables.data(), 
             {1, input_size}, 
-            torch::kFloat
+            torch::kDouble
         );
+
+    input_tensor = input_tensor.to(device);
+    auto output = policy_net->forward(input_tensor);
     simulator->solveStep(t);
   }
   void setEval() { policy_net->eval(); }
