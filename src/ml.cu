@@ -161,12 +161,13 @@ void trainModel(Params config) {
       for (int simulationStep = 0; simulationStep < config.xyModel.iterations;
            simulationStep++) {
         model.step(simulationStep, 
-
             batchIndex, batch_states, batch_actions,
                    batch_rewards);
       }
     }
-    updatePolicy(*model.getPolicyNet(), batch_states, batch_actions, batch_rewards);
+    updatePolicy(*model.getPolicyNet(),
+        *model.getOptimizer()
+        batch_states, batch_actions, batch_rewards);
     auto avg_reward = batch_rewards.mean().item<float>();
     std::cout << "Simulation round " << round + 1 << " complete. Average reward " << avg_reward << std::endl;
   }
