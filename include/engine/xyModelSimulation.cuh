@@ -22,8 +22,7 @@ struct XYModelObservable {
 };
 
 class XYModelEngine
-    : public ObservableComputeEngine<cuDoubleComplex, XYModelObservable,
-                                     double> {
+    : public ObservableComputeEngine<cuDoubleComplex, XYModelObservable> {
 public:
   explicit XYModelEngine(const Params &p);
   ~XYModelEngine() override;
