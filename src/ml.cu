@@ -92,10 +92,9 @@ void trainModel(Params config) {
   // Possible actions are {-1, 0, 1}
   const int action_dim = 3;
 
-  auto ptr = std::make_unique<XYModelEngine>(config);
   auto model = ReinforcementLearningFramework<cuDoubleComplex,
                                               XYModelObservable>(
-      state_dim, action_dim, std::move(ptr));
+      state_dim, action_dim, config);
 
   for (int round = 0; round < config.xyModel.trainingRounds; round++) {
     std::cout<< "Starting simulation round " << round << std::endl;
