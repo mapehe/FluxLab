@@ -58,12 +58,12 @@ protected:
 
 public:
   ReinforcementLearningFramework(int state_dim, int action_dim,
-                                 SimulatorFactory factory)
+                                 SimulatorFactory factory, Params params)
       : policy_net(state_dim, action_dim),
         optimizer(policy_net->parameters(), torch::optim::AdamOptions(1e-3)),
         device(torch::kCUDA), makeSimulator(factory) {
     policy_net->to(device);
-    resetSimulator();
+    resetSimulator(params);
   }
   void step(int t) { simulator->solveStep(t); }
   void setEval() { policy_net->eval(); }
@@ -98,7 +98,7 @@ void trainModel(Params config) {
 
   auto model =
       ReinforcementLearningFramework<cuDoubleComplex, XYModelObservable>(
-          state_dim, action_dim, factory);
+          state_dim, action_dim, factory, config);
 
   for (int round = 0; round < config.xyModel.trainingRounds; round++) {
     std::cout << "Starting simulation round " << round + 1 << std::endl;
