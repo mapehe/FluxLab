@@ -160,7 +160,7 @@ void trainModel(Params config) {
       }
     }
     updatePolicy(model.getPolicyNet(), batch_states, batch_actions, batch_rewards);
-    auto avg_reward = 0;
+    auto avg_reward = batch_rewards.mean().item<float>();
     std::cout << "Simulation round " << round + 1 << " complete. Average reward " << avg_reward << std::endl;
   }
 }
