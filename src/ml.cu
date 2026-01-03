@@ -58,10 +58,13 @@ public:
         optimizer(policy_net->parameters(), torch::optim::AdamOptions(1e-3)),
         device(torch::kCUDA), params(params) {
     policy_net->to(device);
-    simulator = std::make_unique<XYModelEngine>(p);
+    resetSimulator();
   }
   void step(int t) { simulator->solveStep(t); }
   void setEval() { policy_net->eval(); }
+  void resetSimulator = () {
+    simulator = std::make_unique<ObservableComputeEngine<T, U>>(params);
+  }
 };
 
 void assertGPU() {
