@@ -77,6 +77,7 @@ public:
 
     input_tensor = input_tensor.to(device);
     auto output = policy_net->forward(input_tensor);
+
     simulator->solveStep(t);
   }
   void setEval() { policy_net->eval(); }
