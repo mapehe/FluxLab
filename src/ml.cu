@@ -27,18 +27,21 @@ TORCH_MODULE(QNetwork);
 
 void updatePolicy(
     QNetworkImpl *model, torch::optim::Optimizer &optimizer,
-    const torch::Tensor &batch_states,  // Shape: [BatchSize, InputSize]
-    const torch::Tensor &batch_actions, // Shape: [BatchSize, 1] (Type: kLong)
-    const torch::Tensor
-        &batch_rewards // Shape: [BatchSize, 1] (Calculated Returns G_t)
+    const torch::Tensor &batch_states,  // Shape: [BatchSize, SimulationSteps, InputSize]
+    const torch::Tensor &batch_actions, // Shape: [BatchSize, SimulationSteps] (Type: kLong)
+    const torch::Tensor &batch_rewards  // Shape: [BatchSize, SimulationSteps]
 ) {
   model->train();
 
-  auto logits = model->forward(batch_states);
-  auto log_probs_all = torch::log_softmax(logits, /*dim=*/1);
-  auto selected_log_probs = log_probs_all.gather(1, batch_actions);
+  auto input_size = batch_states.size(2);
+  auto flat_states = batch_states.view({-1, input_size});
+  auto logits = model->forward(flat_states);
 
-  auto loss = -(selected_log_probs * batch_rewards).mean();
+  auto log_probs_all = torch::log_softmax(logits, /*dim=*/1);
+  auto flat_actions = batch_actions.view({-1, 1});
+  auto selected_log_probs = log_probs_all.gather(1, flat_actions);
+  auto flat_rewards = batch_rewards.view({-1, 1});
+  auto loss = -(selected_log_probs * flat_rewards).mean();
 
   optimizer.zero_grad();
   loss.backward();
