@@ -85,7 +85,7 @@ public:
 
     batch_states[batchIndex][simulationStep] = input.squeeze(0);
 
-    auto outoput = policy_net->forward(input);
+    auto output = policy_net->forward(input);
     auto action = output.argmax(1).item<int>();
 
     simulator->modelAction(action);
@@ -94,6 +94,9 @@ public:
     simulator->solveStep(simulationStep);
     auto scoreAfter = simulator->getStepScore();
     auto reward = scoreAfter - scoreBefore;
+
+    batch_actions[batchIndex][simulationStep] = action;
+    batch_rewards[batchIndex][simulationStep] = reward;
   }
   void setEval() { policy_net->eval(); }
   void resetSimulator(Params params) { simulator = makeSimulator(params); }
