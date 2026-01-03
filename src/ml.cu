@@ -47,6 +47,7 @@ void updatePolicy(
 template <typename T, typename U>
 class ReinforcementLearningFramework {
 protected:
+  const Params params;
   std::unique_ptr<ObservableComputeEngine<T, U>> simulator;
   QNetwork policy_net;
   torch::optim::Adam optimizer;
