@@ -65,7 +65,8 @@ public:
   ReinforcementLearningFramework(int state_dim, int action_dim,
                                  SimulatorFactory factory, Params params)
       : policy_net(state_dim, action_dim),
-        optimizer(policy_net->parameters(), torch::optim::AdamOptions(1e-3)),
+        optimizer(policy_net->parameters(),
+                  torch::optim::AdamOptions(params.xyModel.learningRate)),
         device(torch::kCUDA), makeSimulator(factory) {
     policy_net->to(device);
     resetSimulator(params);
@@ -94,10 +95,11 @@ public:
     auto scoreBefore = simulator->getStepScore();
     simulator->solveStep(simulationStep);
     auto scoreAfter = simulator->getStepScore();
-    auto reward = -(scoreAfter - scoreBefore);
+    auto reward = scoreAfter;
 
-    batch_actions[batchIndex][simulationStep] = output.argmax(1).item<int64_t>();
-    batch_rewards[batchIndex][simulationStep] = (float) reward;
+    batch_actions[batchIndex][simulationStep] =
+        output.argmax(1).item<int64_t>();
+    batch_rewards[batchIndex][simulationStep] = (float)reward;
   }
   void setEval() { policy_net->eval(); }
   void resetSimulator(Params params) { simulator = makeSimulator(params); }
@@ -141,7 +143,8 @@ void trainModel(Params config) {
         torch::zeros({config.xyModel.trainingBatchSize,
                       config.xyModel.iterations, state_dim});
     torch::Tensor batch_actions = torch::zeros(
-        {config.xyModel.trainingBatchSize, config.xyModel.iterations}, torch::kLong);
+        {config.xyModel.trainingBatchSize, config.xyModel.iterations},
+        torch::kLong);
     torch::Tensor batch_rewards = torch::zeros(
         {config.xyModel.trainingBatchSize, config.xyModel.iterations});
 
@@ -155,10 +158,17 @@ void trainModel(Params config) {
                    batch_rewards);
       }
     }
-    updatePolicy(model.policy_net, model.optimizer, batch_states.to(model.device),
-                 batch_actions.to(model.device), batch_rewards.to(model.device));
-    auto avg_reward = batch_rewards.mean().item<float>();
+    updatePolicy(model.policy_net, model.optimizer,
+                 batch_states.to(model.device), batch_actions.to(model.device),
+                 batch_rewards.to(model.device));
+    const auto avg_mag = batch_states.index({torch::indexing::Slice(), -1, 3})
+                             .mean()
+                             .item<float>();
+    const auto avg_T = batch_states.index({torch::indexing::Slice(), -1, 0})
+                             .mean()
+                             .item<float>();
     std::cout << "Training round " << round + 1
-              << " complete. Average reward " << avg_reward << std::endl;
+              << " complete. Average final magnetization " << avg_mag
+              << " and temperature " << avg_T << std::endl;
   }
 }

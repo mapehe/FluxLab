@@ -107,5 +107,6 @@ Params preprocessParams(const json &j) {
           .trainingRounds = parse<int>(xyModelJson, "trainingRounds", any, ""),
           .trainingBatchSize =
               parse<int>(xyModelJson, "trainingBatchSize", any, ""),
+          .learningRate = parse<float>(xyModelJson, "learningRate", any, ""),
       }};
 }

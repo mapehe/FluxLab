@@ -2,15 +2,13 @@
 #include <algorithm>
 
 const double TAX_VORTEX = 50.0;
-const double TAX_MAG = 5.0;
-const double TAX_TIME = 0.1;
+const double TAX_MAG = 2.0;
 
 double XYModelEngine::getStepScore() {
   double cost_vortex = TAX_VORTEX * observable.vortexDensity;
-  double cost_mag = TAX_MAG * (1.0 - observable.magnetizationMagnitude);
-  double step_loss = cost_mag;
-
-  return -step_loss;
+  double cost_mag = TAX_MAG * (.1 - observable.magnetizationMagnitude) +
+                    .25f * observable.simulationProgress * (observable.T / 2.0f - 0.5f);
+  return -cost_mag;
 }
 
 void XYModelEngine::modelAction(int input) {
